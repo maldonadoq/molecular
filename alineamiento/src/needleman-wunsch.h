@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <iostream>
-#include <stack>
 #include <utility>
 #include <algorithm>
 
