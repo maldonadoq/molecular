@@ -3,15 +3,13 @@
 #include <list>
 #include "src/needleman-wunsch.h"
 
-unsigned TMAX = 1000;
-
 int main(int argc, char const *argv[]){
 
-	//std::string dnaa = "AAAC";
-	//std::string dnab = "AGC";
+	std::string dnaa = "AAAC";
+	std::string dnab = "AGC";
 
-	std::string dnaa = "ACTGATTCA";
-	std::string dnab = "ACGCATCA";
+	// std::string dnaa = "ACTGATTCA";
+	// std::string dnab = "ACGCATCA";
 
 	// std::string dnaa = "GGATCGA";
 	// std::string dnab = "GGATTCAGTTA";
@@ -25,11 +23,12 @@ int main(int argc, char const *argv[]){
 	
 	score = nw->FMakeMatrix();
 	std::pair<std::string, std::string> alignment = nw->FGlobalOptimum();
-	nw->FPrintMatrix();
+	nw->FPrintWeightMatrix();
+	nw->FPrintBackMatrix();
 
 	std::cout << "score: " << score << "\n";
-	std::cout << alignment.first << "\n" << alignment.second << "\n";
 
 	delete nw;
 	return 0;
 }
+
