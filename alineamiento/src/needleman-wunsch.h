@@ -5,6 +5,7 @@
 #include <iostream>
 #include <utility>
 #include <algorithm>
+#include "func.h"
 
 extern unsigned TMAX;
 
@@ -21,8 +22,10 @@ public:
 	TNeedlemanWunsch(std::string, std::string, int, int, int);
 	~TNeedlemanWunsch();
 
-	inline int FMakeMatrix();
-	inline std::pair<std::string, std::string> FGetOptimal();
+	int FMakeMatrix();
+	void FPrintMatrix();
+	std::pair<std::string, std::string> FGlobalOptimum();
+	int FSimilarity(char, char);
 };
 
 TNeedlemanWunsch::TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
@@ -46,20 +49,25 @@ TNeedlemanWunsch::TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
 	}	
 }
 
-inline int TNeedlemanWunsch::FMakeMatrix(){
+int TNeedlemanWunsch::FSimilarity(char _a, char _b){
+	return (_a == _b)? match_score: -mismatch_score;
+}
+
+void TNeedlemanWunsch::FPrintMatrix(){
+	print_matrix(m_dp, n, m);
+}
+
+int TNeedlemanWunsch::FMakeMatrix(){
 	// Init Matrix
-	for(unsigned i=0; i<n; i++){
-		this->m_dp[i][0] = -i*this->gap_score;
-		this->m_dp[0][i] = -i*this->gap_score;
-	}
+	for(unsigned i=0; i<n; i++)	this->m_dp[i][0] = -i*this->gap_score;
+	for(unsigned j=0; j<m; j++)	this->m_dp[0][j] = -j*this->gap_score;
 
 	int tmp;
 	int mtmp;
 
 	for(unsigned i=1; i<n; i++){
 		for(unsigned j=1; j<m; j++){
-			tmp = (this->m_dna[0][i-1] == this->m_dna[1][j-1])
-				? match_score: -mismatch_score;
+			tmp = FSimilarity(m_dna[0][i-1], m_dna[1][j-1]);
 
 			mtmp = std::max(m_dp[i-1][j]-gap_score, m_dp[i][j-1]-gap_score);
 			this->m_dp[i][j] = std::max(m_dp[i-1][j-1]+tmp, mtmp);
@@ -69,7 +77,7 @@ inline int TNeedlemanWunsch::FMakeMatrix(){
 	return this->m_dp[n-1][m-1];
 }
 
-inline std::pair<std::string, std::string> TNeedlemanWunsch::FGetOptimal(){	
+std::pair<std::string, std::string> TNeedlemanWunsch::FGlobalOptimum(){
 	int i = n-1;
 	int j = m-1;
 
