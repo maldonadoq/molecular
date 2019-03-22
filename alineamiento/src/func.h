@@ -8,7 +8,7 @@ template<class T>
 void print_matrix(T **matrix, unsigned _n, unsigned _m){
 	for(unsigned i=0; i<_n; i++){		
 		for(unsigned j=0; j<_m; j++){
-			std::cout << matrix[i][j] << "\t";
+			std::cout << matrix[i][j] << "  ";
 		}
 		std::cout << "\n";
 	}
@@ -21,9 +21,8 @@ void print_matrix(T ***matrix, unsigned _n, unsigned _m, unsigned _l){
 			std::cout << "[";
 			for(unsigned k=0; k<_l; k++){
 				std::cout << matrix[i][j][k];
-				if(k!=_l-1)	std::cout << " ";
 			}
-			std::cout << "] \t";
+			std::cout << "]  ";
 		}
 		std::cout << "\n";
 	}
@@ -51,6 +50,12 @@ void print_vector(std::vector<T> vec){
 	for(unsigned i=0; i<vec.size(); i++)
 		std::cout << vec[i] << " ";
 	std::cout << "\n";
+}
+
+template<class T>
+void print_vector_r(std::vector<T> vec, T r){
+	for(unsigned i=0; i<vec.size(); i++)
+		std::cout << r << "\n" << vec[i] << "\n\n";
 }
 
 template<class T>
