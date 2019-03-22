@@ -7,25 +7,16 @@
 
 int main(int argc, char const *argv[]){
 
-	// std::string dnaa = "AAAC";
-	// std::string dnab = "AGC";
-
-	// std::string dnaa = "ACTGATTCA";
-	// std::string dnab = "ACGCATCA";
-
-	std::string dnaa = "GGATCGA";
-	std::string dnab = "GGATTCAGTTA";
-
-	// std::string dnaa = "CACCAGCGTCACCTACAGTAAACAGAAGGCTCCCAGGGTAAG";
-	// std::string dnab = "ACGATCAGTGGGGACCGTTACTCACATTGCATTGG";
+	std::string dnaa = "AAAC";
+	std::string dnab = "AGC";
 
 	int match    = 1;
 	int mismatch = 1;
 	int gap      = 2;
 
 	int score;
+	
 	std::string larger;
-	unsigned ntotal;
 
 	TNeedlemanWunsch *nw = new TNeedlemanWunsch(dnaa, dnab, match, mismatch, gap);
 
@@ -39,21 +30,22 @@ int main(int argc, char const *argv[]){
 	printf("time matrix:\t%.8lf s\n", time/1000);
 	
 	gettimeofday(&ti, NULL);
-		nw->FGlobalOptimum();
+		nw->FGlobalOptimum(10);
 	gettimeofday(&tf, NULL);
 	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
 	printf("time paths:\t%.8lf s\n\n", time/1000);
 	
-	larger = nw->FGetLargerSequence();	
-	ntotal = nw->FGetTotalAlignment();
+	larger = nw->FGetLargerSequence();
+	// nw->FPrintBackMatrix();
+	// nw->FPrintWeightMatrix();
 	// std::vector<std::string> alignments = nw->FGetAllAlignment();
-	std::vector<std::string> alignments = nw->FGetNAlignment(2);
+	std::vector<std::string> alignments = nw->FGetAlignment();
 
-	std::cout << "score: " << score << "\n";
-	std::cout << "paths: " << ntotal << "\n";	
-
-	print_n(larger, alignments.size());
-	print_vector(alignments);
+	std::cout << "larger: " << larger.size() << "\n";
+	std::cout << "score:  " << score << "\n";
+	std::cout << "paths:  " << ntotal << "\n";
+	
+	print_vector_r(alignments, larger);
 
 	delete nw;
 	return 0;
