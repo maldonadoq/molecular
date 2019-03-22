@@ -9,7 +9,7 @@
 #include <queue>
 #include "func.h"
 
-#define TMAX 1000
+#define TMAX 100
 #define PATH 3
 
 
@@ -34,34 +34,36 @@ public:
 	char ***m_back;				// matrix to do the traceback
 
 	TNeedlemanWunsch(std::string, std::string, int, int, int);
-	~TNeedlemanWunsch();
-
+	~TNeedlemanWunsch();			
+	
 	int  FMakeMatrix();
-	void FPrintWeightMatrix();
+	void FGlobalOptimum();
 	void FPrintBackMatrix();
-	void FGlobalOptimum();	
+	int  FGetTotalAlignment();
+	void FPrintWeightMatrix();
 	int  FSimilarity(char, char);
 
 	std::string FGetLargerSequence();
-	std::vector<std::string> FGetAllAligment();
+	std::vector<std::string> FGetAllAlignment();
+	std::vector<std::string> FGetNAlignment(unsigned);
 };
 
 TNeedlemanWunsch::TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
-	int _match, int _mismatch, int _gap){
+	int _match, int _mismatch, int _gap){	
 
-	this->m_dna[0] = _dnaa;
-	this->m_dna[1] = _dnab;
+	if((_dnaa.size() <  TMAX) and (_dnab.size() < TMAX)){
+		this->m_dna[0] = (_dnaa.size()>_dnab.size())? _dnaa: _dnab;
+		this->m_dna[1] = (_dnaa.size()<_dnab.size())? _dnaa: _dnab;
 
-	this->n = this->m_dna[0].size()+1;
-	this->m = this->m_dna[1].size()+1;
+		this->n = m_dna[0].size()+1;
+		this->m = m_dna[1].size()+1;
 
-	this->match_score    = _match;
-	this->mismatch_score = _mismatch;
-	this->gap_score      = _gap;
+		this->match_score    = _match;
+		this->mismatch_score = _mismatch;
+		this->gap_score      = _gap;
 
-	this->m_align.clear();
-
-	if((this->n <  TMAX) and (this->m < TMAX)){
+		this->m_align.clear();
+	
 		this->m_dp   = new int*[this->n];
 		this->m_back = new char**[this->n];
 		for(unsigned i=0; i<this->n; i++){
@@ -104,7 +106,7 @@ int TNeedlemanWunsch::FMakeMatrix(){
 	int tmp;
 	int p,q,r,mx;
 
-	// Array [0,0,0,0,0,0]
+	// Array [0,0,0]
 	for(unsigned i=1; i<n; i++){
 		for(unsigned j=1; j<m; j++){
 			tmp = FSimilarity(m_dna[0][i-1], m_dna[1][j-1]);
@@ -126,7 +128,7 @@ int TNeedlemanWunsch::FMakeMatrix(){
 }
 
 std::string TNeedlemanWunsch::FGetLargerSequence(){
-	return (m_dna[0].size() > m_dna[1].size())? m_dna[0] : m_dna[1];
+	return m_dna[0];
 }
 
 void TNeedlemanWunsch::FGlobalOptimum(){
@@ -142,7 +144,7 @@ void TNeedlemanWunsch::FGlobalOptimum(){
 	std::pair<int, int> last;
 	std::pair<int, int> tmp;
 
-	std::vector<std::vector<std::pair<int, int> > >	maligment;
+	std::vector<std::vector<std::pair<int, int> > >	malignment;
 
 	while(!mqueue.empty()){
 		mpath = mqueue.front();
@@ -151,8 +153,8 @@ void TNeedlemanWunsch::FGlobalOptimum(){
 		last = mpath[mpath.size()-1];		
 
 		if(last == trg){
-			print_vector_pair(mpath);
-			maligment.push_back(mpath);
+			// print_vector_pair(mpath);
+			malignment.push_back(mpath);
 		}
 
 		if(last.first>0 or last.second>0){
@@ -180,62 +182,44 @@ void TNeedlemanWunsch::FGlobalOptimum(){
 		}
 	}
 
-	unsigned k;
+	int k;
 
-	std::string dna = (m_dna[0].size() < m_dna[1].size())? m_dna[0] : m_dna[1];
-	int idx = (m_dna[0].size() < m_dna[1].size())? 0 : 1;
+	std::string dna = m_dna[1];
+	std::string alignm;
 
-	std::string aligm;
+	for(unsigned i=0; i<malignment.size(); i++){
+		alignm = "";
+		k = 0;
 
-	for(unsigned i=0; i<maligment.size(); i++){
-		aligm = "";
+		for(int j=malignment[i].size()-2; j>=0 ; j--){
+			tmp = malignment[i][j];			
+			if(tmp.second == k)		alignm += '-';
+			else					alignm += dna[tmp.second-1];
 
-		tmp = maligment[i][0];
-		switch(idx){
-			case 0:{
-				aligm = dna[tmp.first-1];
-				k= tmp.first;
-				break;
-			}
-			case 1:{
-				aligm = dna[tmp.second-1];
-				k= tmp.second;
-				break;
-			}								
+			k = tmp.second;
 		}
 
-		for(unsigned j=1; j<maligment[i].size()-1; j++){
-			tmp = maligment[i][j];			
-
-			switch(idx){
-				case 0:{
-					// n					
-					if(tmp.first == k)
-						aligm = '-'+aligm;
-					else
-						aligm = dna[tmp.first-1] + aligm;
-
-					k = tmp.first;
-					break;					
-				}
-				case 1:{
-					// m
-					if(tmp.second == k)
-						aligm = '-'+aligm;
-					else
-						aligm = dna[tmp.second-1] + aligm;
-
-					k = tmp.second;
-					break;
-				}
-			}
-		}
-
-		this->m_align.push_back(aligm);
+		this->m_align.push_back(alignm);
 	}
 }
 
-std::vector<std::string> TNeedlemanWunsch::FGetAllAligment(){
+int TNeedlemanWunsch::FGetTotalAlignment(){
+	return this->m_align.size();
+}
+
+std::vector<std::string> TNeedlemanWunsch::FGetAllAlignment(){
+	return this->m_align;
+}
+
+std::vector<std::string> TNeedlemanWunsch::FGetNAlignment(unsigned _n){
+	if(_n < this->m_align.size()){
+		std::vector<std::string> tmp;
+		for(unsigned i=0; i<_n; i++)
+			tmp.push_back(m_align[i]);
+
+		return tmp;
+	}
+
 	return this->m_align;
 }
 
