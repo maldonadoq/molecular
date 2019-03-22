@@ -1,6 +1,9 @@
 #ifndef _FUNC_H_
 #define _FUNC_H_
 
+#include <utility>
+#include <vector>
+
 template<class T>
 void print_matrix(T **matrix, unsigned _n, unsigned _m){
 	for(unsigned i=0; i<_n; i++){		
@@ -24,6 +27,30 @@ void print_matrix(T ***matrix, unsigned _n, unsigned _m, unsigned _l){
 		}
 		std::cout << "\n";
 	}
+}
+
+template <class T>
+void print_vector_pair(std::vector<std::pair<T, T> > &vec){
+	for(unsigned i=0; i<vec.size(); i++)
+		std::cout << "[" << vec[i].first << "," << vec[i].second << "] ";
+	std::cout << "\n";
+}
+
+template <class T>
+bool is_not_visited(std::vector<std::pair<T, T> > &vec, std::pair<T,T> t){
+	for(unsigned i=0; i<vec.size(); i++){
+		if(vec[i] == t)
+			return false;
+	}
+
+	return true;
+}
+
+template<class T>
+void print_vector(std::vector<T> vec){
+	for(unsigned i=0; i<vec.size(); i++)
+		std::cout << vec[i] << " ";
+	std::cout << "\n";
 }
 
 #endif
