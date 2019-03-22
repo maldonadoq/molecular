@@ -22,13 +22,20 @@ int main(int argc, char const *argv[]){
 	TNeedlemanWunsch *nw = new TNeedlemanWunsch(dnaa, dnab, match, mismatch, gap);
 	
 	score = nw->FMakeMatrix();
-	std::pair<std::string, std::string> alignment = nw->FGlobalOptimum();
-	nw->FPrintWeightMatrix();
-	nw->FPrintBackMatrix();
 
-	std::cout << "score: " << score << "\n";
+	std::string larger;
+	
+	nw->FGlobalOptimum();
+	// nw->FPrintWeightMatrix();
+	// nw->FPrintBackMatrix();
+	larger = nw->FGetLargerSequence();
+	std::vector<std::string> alignments = nw->FGetAllAligment();	
+	
+	std::cout << "score:  " << score << "\n";
+	std::cout << "larger: " << larger << "\n";	
+
+	print_vector(alignments);
 
 	delete nw;
 	return 0;
 }
-
