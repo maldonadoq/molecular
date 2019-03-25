@@ -6,7 +6,7 @@
 #include <utility>
 #include <algorithm>
 #include <vector>
-#include <queue>
+#include <list>
 #include "func.h"
 
 #define TMAX 1000
@@ -29,8 +29,9 @@ private:
 	int mismatch_score;					// mismatch score
 	int gap_score;						// gap score
 	std::vector<std::string> m_align;	// all aligments
+	unsigned m_qp;						// number to stop recursion!!
 public:	
-	int **m_dp;					// matrix
+	int  **m_dp;					// matrix
 	char ***m_back;				// matrix to do the traceback
 
 	TNeedlemanWunsch(std::string, std::string, int, int, int);
@@ -38,8 +39,10 @@ public:
 	
 	int  FMakeMatrix();
 	void FGlobalOptimum(unsigned);
+	void FGlobalOptimum(std::pair<int, int>, std::pair<int,int>, bool **, std::vector<std::pair<int, int> > &,
+		std::vector<std::vector<std::pair<int, int> > > &, bool &);
 	void FPrintBackMatrix();
-	int  FGetTotalAlignment();
+	int  FGetNumberAlignment();
 	void FPrintWeightMatrix();
 	int  FSimilarity(char, char);
 
@@ -61,6 +64,7 @@ TNeedlemanWunsch::TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
 		this->mismatch_score = _mismatch;
 		this->gap_score      = _gap;
 
+		this->m_qp	= 0;
 		this->m_align.clear();
 	
 		this->m_dp   = new int*[this->n];
@@ -134,80 +138,66 @@ void TNeedlemanWunsch::FGlobalOptimum(unsigned _n){
 	std::pair<int, int> src = std::make_pair(n-1,m-1);
 	std::pair<int, int> trg = std::make_pair(0,0);	
 
-	std::queue<std::vector<std::pair<int, int> > >	mqueue;
-	std::queue<std::vector<std::pair<int, int> > >	mempty;
-	std::vector<std::pair<int, int> >				mpath;
+	this->m_qp = _n;
 
-	mpath.push_back(src);
-	mqueue.push(mpath);
+	// pull boolean matrix [m][n]
+	bool **visited = new bool*[n];
+	for(unsigned i=0; i<n; i++){
+		visited[i] = new bool[m];
+		for(unsigned j=0; j<m; j++)
+			visited[i][j] = false;
+	}
 
-	std::pair<int, int> last;
-	std::pair<int, int> tmp;
+	std::vector<std::pair<int, int> > mpath;
+	std::vector<std::vector<std::pair<int, int> > > mpaths;
+	bool end = false;
+	FGlobalOptimum(src, trg, visited, mpath, mpaths, end);
 
-	std::vector<std::vector<std::pair<int, int> > >	malignment;
+	for(unsigned i=0; i<mpaths.size(); i++)
+		print_vector_pair(mpaths[i]);
+}
 
-	while(!mqueue.empty()){
-		mpath = mqueue.front();
-		mqueue.pop();
+void TNeedlemanWunsch::FGlobalOptimum(std::pair<int, int> _src, std::pair<int, int> _trg,
+	bool ** _visited, std::vector<std::pair<int, int> > &_path,
+	std::vector<std::vector<std::pair<int, int> > > &_mpaths, bool &_end){
 
-		last = mpath[mpath.size()-1];		
+	_visited[_src.first][_src.second] = true;
+	_path.push_back(_src);
 
-		if(last == trg){
-			// print_vector_pair(mpath);
-			malignment.push_back(mpath);
-			if(malignment.size() == _n)
-				mqueue = mempty;
-		}
-
-		else{
-			for(unsigned i=0; i<PATH; i++){
-				if(m_back[last.first][last.second][i] == '1'){					
-					switch(i){
-						case 0:
-							tmp = std::make_pair(last.first,   last.second-1);							
-							break;
-						case 1:
-							tmp = std::make_pair(last.first-1, last.second-1);
-							break;
-						case 2:
-							tmp = std::make_pair(last.first-1, last.second);
-							break;
-					}
-
-					if(is_not_visited(mpath, tmp)){
-					// if(m_dp[tmp.first, tmp.second][3] == '0'){
-						std::vector<std::pair<int, int> > tpath(mpath);
-						tpath.push_back(tmp);
-						mqueue.push(tpath);
+	if(_src == _trg){
+		_mpaths.push_back(_path);
+		if(_mpaths.size()>=this->m_qp)
+			_end = true;
+	}
+	else{
+		std::pair<int, int> tmp;
+		for(unsigned i=0; i<PATH; i++){
+			if(m_back[_src.first][_src.second][i] == '1' and !_end){
+				switch(i){
+					case 0:
+						tmp = std::make_pair(_src.first,   _src.second-1);
+						break;
+					case 1:
+						tmp = std::make_pair(_src.first-1, _src.second-1);
+						break;
+					case 2:
+						tmp = std::make_pair(_src.first-1, _src.second);
+						break;
+				}
+				if(tmp.first>=0 and tmp.second>=0){
+					if(!_visited[tmp.first][tmp.second]){
+						FGlobalOptimum(tmp, _trg, _visited, _path, _mpaths, _end);
 					}
 				}
 			}
 		}
 	}
 
-	
-	int k;
-
-	std::string dna = m_dna[1];
-	std::string alignm;
-
-	for(unsigned i=0; i<malignment.size(); i++){
-		alignm = "";
-		k = 0;
-
-		for(int j=malignment[i].size()-2; j>=0 ; j--){
-			tmp = malignment[i][j];			
-			if(tmp.second == k)		alignm += '-';
-			else					alignm += dna[tmp.second-1];
-
-			k = tmp.second;
-		}
-
-		this->m_align.push_back(alignm);
-	}
+	_path.pop_back();
+	_visited[_src.first][_src.second] = false;
 }
 
-int TNeedlemanWunsch::FGetTotalAlignment(){
+int TNeedlemanWunsch::FGetNumberAlignment(){
 	return this->m_align.size();
 }
 
