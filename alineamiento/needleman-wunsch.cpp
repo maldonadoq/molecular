@@ -2,23 +2,23 @@
 #include <utility>
 #include <unistd.h>
 #include <sys/time.h>
-#include <list>
 #include "src/needleman-wunsch.h"
 
 int main(int argc, char const *argv[]){
 
-	std::string dnaa = "AAAC";
+	// std::string dnaa = "GTTTGTTAGAGAATAAACCCGCTAACACGTAGATTCATATTGACTCTTTGGTTCCCCCATATTGTCAATGGGCAAGAGACACGGCTATTTTCAGATTCACTTTATGATCGGCGGTCTCGCTACCCGCATTTATCTAAATAATTCGCGTAAAGTACAACCGATGATTTCTCCAGTCGTAACGGATTTCCGCGTACTAGCTGAATGTGCTCTACAAGTACGCACGGCTGTTCTCATAGAGTAGACCTAATTCCTCCATCGCTGTCCCTGTCCTCTTATGGTTGGGATGGCGGAGTCGGATTTGATCAAAAGTCATAGGCTACGGATAATCTGAACCTACGCGCTTAGACATGGATCCTGAACCACTAGCTATAGCCTTCACCGACTTGTTTTACCCATCAATAATTGATACTGGGGCAAAACCATTTTCTTAGTTCATCGCCCGAGGCATTACATAAATTGTTTTTAATTGAAGTTCTGCGTTCGGAGGACGCCTGAAAACCTACCCGGAAGCGTCTTGGTAATTGTAAGGACGTACGCCGATTCATAATGCTGTACTGTCCGGGTGTGACGGCACCTGATTTATGGCAACCACCTACCTCT";
+	// std::string dnab = "CGGGACTAGCGCCTGGAAATGATTGGATAATGGCCTTTCGTGCACAGTACGTGACCACCTGGGGTAGGTTGCTCGTAAATAGACATGCCGTGAAAGTACCAACACTACATTAACCGGGGCTACAGCGTAGTGCTGAGATAGACGGCGTAGGACTCCCCTTGACTCCGACATGGCAGATTACGTCCGCCATGGGACCTTCCTTTGGCGAAAGAGCCCCTTTCCCGGGGTATTTACAAAACTGTTGCCAGCGATGCCGTTAGGAGTCTCACTAGACGCGATTGTCCATCATGAAATTGAGATATAGCCTCTCGGTAAAATGAAGCCTTCATCTTAAATTTGGGAACAGTTTGATAGCTCTTGTTCAAAGCAGTTGTGTCGTAGCGAGGGAGCTCTAGCGCCC";
+
+	std::string dnaa = "AAAC";	
 	std::string dnab = "AGC";
-	// std::string dnaa = "TGCATTGGAAGTACTGGTGGTGAGT";
-	// std::string dnab = "GGCTCCCAGACTGCTTAA";
 
 	int match    = 1;
 	int mismatch = 1;
 	int gap      = 2;
+	unsigned n 	 = 1000;
 
 	int score;
-
-	std::string larger;
+	std::vector<std::pair<std::string, std::string> > alignments;
 
 	TNeedlemanWunsch *nw = new TNeedlemanWunsch(dnaa, dnab, match, mismatch, gap);
 
@@ -29,13 +29,18 @@ int main(int argc, char const *argv[]){
 		score = nw->FMakeMatrix();
 	gettimeofday(&tf, NULL);
 	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
-	printf("time matrix:\t%.8lf s\n", time/1000);
+	printf("[time matrix]:\t%.8lf s\n", time/1000);
 	
 	gettimeofday(&ti, NULL);
-		nw->FGlobalOptimum(10);
+		alignments = nw->FGlobalOptimum(n);
 	gettimeofday(&tf, NULL);
 	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
-	printf("time paths:\t%.8lf s\n", time/1000);		
+	printf("[time paths] :\t%.8lf s\n", time/1000);		
+
+	std::cout << "[score]      :\t" << score << "\n";
+	// nw->FPrintWeightMatrix();
+	// nw->FPrintBackMatrix();
+	print_vector_pair_a(alignments);
 
 	delete nw;
 	return 0;
