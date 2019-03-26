@@ -1,29 +1,47 @@
 #include <iostream>
+#include <utility>
+#include <unistd.h>
+#include <sys/time.h>
 #include "src/smith-waterman.h"
 
-unsigned TMAX = 1000;
-
 int main(int argc, char const *argv[]){
-	
-	// std::string dnaa = "ACACACGG";
-	// std::string dnab = "ACCCG";
+	// std::string dnaa = "GTTTGTTAGAGAATAAACCCGCTAACACGTAGATTCATATTGACTCTTTGGTTCCCCCATATTGTCAATGGGCAAGAGACACGGCTATTTTCAGATTCACTTTATGATCGGCGGTCTCGCTACCCGCATTTATCTAAATAATTCGCGTAAAGTACAACCGATGATTTCTCCAGTCGTAACGGATTTCCGCGTACTAGCTGAATGTGCTCTACAAGTACGCACGGCTGTTCTCATAGAGTAGACCTAATTCCTCCATCGCTGTCCCTGTCCTCTTATGGTTGGGATGGCGGAGTCGGATTTGATCAAAAGTCATAGGCTACGGATAATCTGAACCTACGCGCTTAGACATGGATCCTGAACCACTAGCTATAGCCTTCACCGACTTGTTTTACCCATCAATAATTGATACTGGGGCAAAACCATTTTCTTAGTTCATCGCCCGAGGCATTACATAAATTGTTTTTAATTGAAGTTCTGCGTTCGGAGGACGCCTGAAAACCTACCCGGAAGCGTCTTGGTAATTGTAAGGACGTACGCCGATTCATAATGCTGTACTGTCCGGGTGTGACGGCACCTGATTTATGGCAACCACCTACCTCT";
+	// std::string dnab = "CGGGACTAGCGCCTGGAAATGATTGGATAATGGCCTTTCGTGCACAGTACGTGACCACCTGGGGTAGGTTGCTCGTAAATAGACATGCCGTGAAAGTACCAACACTACATTAACCGGGGCTACAGCGTAGTGCTGAGATAGACGGCGTAGGACTCCCCTTGACTCCGACATGGCAGATTACGTCCGCCATGGGACCTTCCTTTGGCGAAAGAGCCCCTTTCCCGGGGTATTTACAAAACTGTTGCCAGCGATGCCGTTAGGAGTCTCACTAGACGCGATTGTCCATCATGAAATTGAGATATAGCCTCTCGGTAAAATGAAGCCTTCATCTTAAATTTGGGAACAGTTTGATAGCTCTTGTTCAAAGCAGTTGTGTCGTAGCGAGGGAGCTCTAGCGCCC";
 
-	std::string dnaa = "ACACAAAGGTTTACGG";
-	std::string dnab = "ACCCAAATTTAG";
+	std::string dnaa = "AGCT";
+	std::string dnab = "GCA";
 
 	int match    = 1;
 	int mismatch = 1;
-	int gap      = 4;
+	int gap      = 2;
+	unsigned n 	 = 10;
+
+	int score;	
+
+	std::vector<std::pair<std::string, std::string> > alignments;
 
 	TSmithWaterman *sw = new TSmithWaterman(dnaa, dnab, match, mismatch, gap);
-	sw->FMakeMatrix();
-	std::pair<std::string, std::string> alignment = sw->FLocalOptimum();
 
-	//sw->FPrintMatrix();
+	struct timeval ti, tf;
+	double time;
 
-	std::cout << alignment.first << "\n" << alignment.second << "\n";
+	gettimeofday(&ti, NULL);		
+		score = sw->FMakeMatrix();
+	gettimeofday(&tf, NULL);
+	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
+	printf("[time matrix]:\t%.8lf s\n", time/1000);
+	
+	gettimeofday(&ti, NULL);
+		alignments = sw->FLocalOptimum(n);
+	gettimeofday(&tf, NULL);
+	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
+	printf("[time paths] :\t%.8lf s\n", time/1000);		
+
+	std::cout << "[score]      :\t" << score << "\n";
+	// sw->FPrintWeightMatrix();
+	// sw->FPrintBackMatrix();
+	print_vector_pair(alignments);
 
 	delete sw;
-
 	return 0;
 }
