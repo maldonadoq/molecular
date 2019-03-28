@@ -1,45 +1,44 @@
 #include <iostream>
 #include <utility>
-#include <unistd.h>
-#include <sys/time.h>
+#include<chrono>
+#include<stdio.h>
 #include "src/needleman-wunsch.h"
 
+using namespace std::chrono;
+
 int main(int argc, char const *argv[]){
-
-	// std::string dnaa = "GTTTGTTAGAGAATAAACCCGCTAACACGTAGATTCATATTGACTCTTTGGTTCCCCCATATTGTCAATGGGCAAGAGACACGGCTATTTTCAGATTCACTTTATGATCGGCGGTCTCGCTACCCGCATTTATCTAAATAATTCGCGTAAAGTACAACCGATGATTTCTCCAGTCGTAACGGATTTCCGCGTACTAGCTGAATGTGCTCTACAAGTACGCACGGCTGTTCTCATAGAGTAGACCTAATTCCTCCATCGCTGTCCCTGTCCTCTTATGGTTGGGATGGCGGAGTCGGATTTGATCAAAAGTCATAGGCTACGGATAATCTGAACCTACGCGCTTAGACATGGATCCTGAACCACTAGCTATAGCCTTCACCGACTTGTTTTACCCATCAATAATTGATACTGGGGCAAAACCATTTTCTTAGTTCATCGCCCGAGGCATTACATAAATTGTTTTTAATTGAAGTTCTGCGTTCGGAGGACGCCTGAAAACCTACCCGGAAGCGTCTTGGTAATTGTAAGGACGTACGCCGATTCATAATGCTGTACTGTCCGGGTGTGACGGCACCTGATTTATGGCAACCACCTACCTCT";
-	// std::string dnab = "CGGGACTAGCGCCTGGAAATGATTGGATAATGGCCTTTCGTGCACAGTACGTGACCACCTGGGGTAGGTTGCTCGTAAATAGACATGCCGTGAAAGTACCAACACTACATTAACCGGGGCTACAGCGTAGTGCTGAGATAGACGGCGTAGGACTCCCCTTGACTCCGACATGGCAGATTACGTCCGCCATGGGACCTTCCTTTGGCGAAAGAGCCCCTTTCCCGGGGTATTTACAAAACTGTTGCCAGCGATGCCGTTAGGAGTCTCACTAGACGCGATTGTCCATCATGAAATTGAGATATAGCCTCTCGGTAAAATGAAGCCTTCATCTTAAATTTGGGAACAGTTTGATAGCTCTTGTTCAAAGCAGTTGTGTCGTAGCGAGGGAGCTCTAGCGCCC";
-
-	std::string dnaa = "AAAC";	
-	std::string dnab = "AGC";
+	std::string dnaa = "ACGGTGCACAAGTTCACCAGTTGAACAAATTCGGTGCAGTCACCATAACGGTGCAGTCACCAGGCGGTGCAGTCACCCGGCGGTCGGTGCAGCATGCAAGCAACGGTGCAGTCACCAGGCACCAGTGCACAAGTTCACCAGTTTAACGAAGTGCAGTCACC";	
+	std::string dnab = "ACCGTGCAGTTGAACATCGGTGCAGAATTCGGTGCAGTCACCATAACGGTCGGTGCAGTGCAGTCACCAGGCGGTGCAGTCACCCGGCGGTCGGTGCAGCATGCAAGCAACGGTGCAGTCACCAGGCACCATCAGTCACCAGGCACCACCAGCGGTGCAG";
 
 	int match    = 1;
 	int mismatch = 1;
 	int gap      = 2;
-	unsigned n 	 = 1000;
+	unsigned n 	 = 20;
 
 	int score;
 	std::vector<std::pair<std::string, std::string> > alignments;
 
 	TNeedlemanWunsch *nw = new TNeedlemanWunsch(dnaa, dnab, match, mismatch, gap);
 
-	struct timeval ti, tf;
-	double time;
+	high_resolution_clock::time_point tinit;
+	high_resolution_clock::time_point tend;
 
-	gettimeofday(&ti, NULL);		
+	tinit = high_resolution_clock::now();
 		score = nw->FMakeMatrix();
-	gettimeofday(&tf, NULL);
-	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
-	printf("[time matrix]:\t%.8lf s\n", time/1000);
+	tend = high_resolution_clock::now();
+	duration<double> time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[time matrix]: " << time_span.count() << " s\n";
 	
-	gettimeofday(&ti, NULL);
+	tinit = high_resolution_clock::now();
 		alignments = nw->FGlobalOptimum(n);
-	gettimeofday(&tf, NULL);
-	time = (tf.tv_sec - ti.tv_sec)*1000 + (tf.tv_usec - ti.tv_usec)/1000;
-	printf("[time paths] :\t%.8lf s\n", time/1000);		
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[time paths] : " << time_span.count() << " s\n";
 
-	std::cout << "[score]      :\t" << score << "\n";
+	std::cout << "[score]      : " << score << "\n";
 	// nw->FPrintWeightMatrix();
 	// nw->FPrintBackMatrix();
+	std::cout << "[find]       : " << alignments.size() << "\n";
 	print_vector_pair_a(alignments);
 
 	delete nw;
