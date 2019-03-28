@@ -4,95 +4,27 @@
 #include <string.h>
 #include <iostream>
 #include <utility>
-#include <algorithm>
 #include <vector>
-#include <list>
-#include "func.h"
+#include "alignment.h"
 
 #define TMAX 1000
 #define PATH 3
 
+class TNeedlemanWunsch: public TAlignment{
+public:
+	unsigned m_qp;
+	TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
+	int _match, int _mismatch, int _gap): TAlignment(_dnaa,_dnab,_match,_mismatch,_gap){
+		this->m_qp = 0;
+	}
 
-/*	
-	1   2
-	 \  |
-	  \ |
-	0---1
-*/
-
-
-class TNeedlemanWunsch{
-private:
-	std::string m_dna[2];				// dna string
-	unsigned n, m;						// matrix
-	int match_score;					// match score
-	int mismatch_score;					// mismatch score
-	int gap_score;						// gap score
-	std::vector<std::string> m_align;	// all aligments
-	unsigned m_qp;						// number to stop recursion!!
-public:	
-	int  **m_dp;					// matrix
-	char ***m_back;				// matrix to do the traceback
-
-	TNeedlemanWunsch(std::string, std::string, int, int, int);
-	~TNeedlemanWunsch();			
+	~TNeedlemanWunsch(){	};
 	
 	int  FMakeMatrix();
-	void FGlobalOptimum(unsigned);
-	void FGlobalOptimum(std::pair<int, int>, std::pair<int,int>, bool **, std::vector<std::pair<int, int> > &,
+	std::vector<std::pair<std::string,std::string> > FGlobalOptimum(unsigned);
+	void FDFS(std::pair<int, int>, std::pair<int,int>, bool **, std::vector<std::pair<int, int> > &,
 		std::vector<std::vector<std::pair<int, int> > > &, bool &);
-	void FPrintBackMatrix();
-	int  FGetNumberAlignment();
-	void FPrintWeightMatrix();
-	int  FSimilarity(char, char);
-
-	std::string FGetLargerSequence();
-	std::vector<std::string> FGetAlignment();
 };
-
-TNeedlemanWunsch::TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
-	int _match, int _mismatch, int _gap){	
-
-	if((_dnaa.size() <  TMAX) and (_dnab.size() < TMAX)){
-		this->m_dna[0] = (_dnaa.size()>_dnab.size())? _dnaa: _dnab;
-		this->m_dna[1] = (_dnaa.size()<_dnab.size())? _dnaa: _dnab;
-
-		this->n = m_dna[0].size()+1;
-		this->m = m_dna[1].size()+1;
-
-		this->match_score    = _match;
-		this->mismatch_score = _mismatch;
-		this->gap_score      = _gap;
-
-		this->m_qp	= 0;
-		this->m_align.clear();
-	
-		this->m_dp   = new int*[this->n];
-		this->m_back = new char**[this->n];
-		for(unsigned i=0; i<this->n; i++){
-			this->m_dp[i] = new int[this->m];
-			this->m_back[i] = new char*[this->m];
-			for(unsigned j=0; j<this->m; j++){
-				this->m_back[i][j] = new char[PATH];
-				for(unsigned k=0; k<PATH; k++){
-					this->m_back[i][j][k] = '0';
-				}					
-			}
-		}
-	}
-}
-
-int TNeedlemanWunsch::FSimilarity(char _a, char _b){
-	return (_a == _b)? match_score: -mismatch_score;
-}
-
-void TNeedlemanWunsch::FPrintWeightMatrix(){
-	print_matrix(m_dp, n, m);
-}
-
-void TNeedlemanWunsch::FPrintBackMatrix(){
-	print_matrix(m_back, n, m, PATH);
-}
 
 int TNeedlemanWunsch::FMakeMatrix(){
 	// Init Matrix
@@ -130,11 +62,8 @@ int TNeedlemanWunsch::FMakeMatrix(){
 	return this->m_dp[n-1][m-1];
 }
 
-std::string TNeedlemanWunsch::FGetLargerSequence(){
-	return m_dna[0];
-}
+std::vector<std::pair<std::string,std::string> > TNeedlemanWunsch::FGlobalOptimum(unsigned _n){
 
-void TNeedlemanWunsch::FGlobalOptimum(unsigned _n){
 	std::pair<int, int> src = std::make_pair(n-1,m-1);
 	std::pair<int, int> trg = std::make_pair(0,0);	
 
@@ -151,13 +80,47 @@ void TNeedlemanWunsch::FGlobalOptimum(unsigned _n){
 	std::vector<std::pair<int, int> > mpath;
 	std::vector<std::vector<std::pair<int, int> > > mpaths;
 	bool end = false;
-	FGlobalOptimum(src, trg, visited, mpath, mpaths, end);
+	FDFS(src, trg, visited, mpath, mpaths, end);
+	delete []visited;
 
-	for(unsigned i=0; i<mpaths.size(); i++)
-		print_vector_pair(mpaths[i]);
+	std::vector<std::pair<std::string, std::string> > alignments;
+	std::pair<std::string, std::string> alignm;
+	std::pair<unsigned, unsigned> tmp;
+	
+	unsigned ii;
+	unsigned jj;
+
+	for(unsigned i=0; i<mpaths.size(); i++){
+		alignm.first  = "";
+		alignm.second = "";
+
+		ii = 0;
+		jj = 0;
+		
+		for(int j=mpaths[i].size()-2; j>=0; j--){
+			tmp = mpaths[i][j];
+
+			// std::cout << "[" << tmp.first << "," << tmp.second << "] ";
+
+			if(tmp.first == ii) alignm.first += '-';
+			else alignm.first += m_dna[0][tmp.first-1];
+
+			if(tmp.second == jj) alignm.second += '-';
+			else alignm.second += m_dna[1][tmp.second-1];
+
+ 			ii = tmp.first;	
+ 			jj = tmp.second;
+		}
+		// std::cout << "\n";
+		alignments.push_back(make_pair(alignm.first, alignm.second));		
+	}
+
+	mpaths.clear();
+
+	return alignments;
 }
 
-void TNeedlemanWunsch::FGlobalOptimum(std::pair<int, int> _src, std::pair<int, int> _trg,
+void TNeedlemanWunsch::FDFS(std::pair<int, int> _src, std::pair<int, int> _trg,
 	bool ** _visited, std::vector<std::pair<int, int> > &_path,
 	std::vector<std::vector<std::pair<int, int> > > &_mpaths, bool &_end){
 
@@ -186,7 +149,7 @@ void TNeedlemanWunsch::FGlobalOptimum(std::pair<int, int> _src, std::pair<int, i
 				}
 				if(tmp.first>=0 and tmp.second>=0){
 					if(!_visited[tmp.first][tmp.second]){
-						FGlobalOptimum(tmp, _trg, _visited, _path, _mpaths, _end);
+						FDFS(tmp, _trg, _visited, _path, _mpaths, _end);
 					}
 				}
 			}
@@ -195,19 +158,6 @@ void TNeedlemanWunsch::FGlobalOptimum(std::pair<int, int> _src, std::pair<int, i
 
 	_path.pop_back();
 	_visited[_src.first][_src.second] = false;
-}
-
-int TNeedlemanWunsch::FGetNumberAlignment(){
-	return this->m_align.size();
-}
-
-std::vector<std::string> TNeedlemanWunsch::FGetAlignment(){
-	return this->m_align;
-}
-
-
-TNeedlemanWunsch::~TNeedlemanWunsch(){
-	delete []this->m_dp;
 }
 
 #endif
