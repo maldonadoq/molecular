@@ -13,10 +13,15 @@ int main(int argc, char const *argv[]){
 	int match    = 1;
 	int mismatch = 1;
 	int gap      = 2;
-	unsigned n 	 = 20;
+
+	float p = 4;
+	float q = 2;
+
+	unsigned n 	 = 1000;
 
 	int score;
-	std::vector<std::pair<std::string, std::string> > alignments;
+	std::vector<std::pair<std::string,std::string> > alignments;
+	std::vector<std::pair<std::string,std::string> > balignments;
 
 	TNeedlemanWunsch *nw = new TNeedlemanWunsch(dnaa, dnab, match, mismatch, gap);
 
@@ -27,19 +32,30 @@ int main(int argc, char const *argv[]){
 		score = nw->FMakeMatrix();
 	tend = high_resolution_clock::now();
 	duration<double> time_span = duration_cast<duration<double>>(tend - tinit);
-	std::cout << "[time matrix]: " << time_span.count() << " s\n";
+	std::cout << "[time matrix] : " << time_span.count() << " s\n";
 	
 	tinit = high_resolution_clock::now();
-		alignments = nw->FGlobalOptimum(n);
+		alignments = nw->FGlobalOptimum(n);		
 	tend = high_resolution_clock::now();
 	time_span = duration_cast<duration<double>>(tend - tinit);
-	std::cout << "[time paths] : " << time_span.count() << " s\n";
+	std::cout << "[time paths]  : " << time_span.count() << " s\n";
+	
+	tinit = high_resolution_clock::now();
+		balignments = nw->FGetBestAlignment(alignments, p, q);
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[time penalty]: " << time_span.count() << " s\n";
 
-	std::cout << "[score]      : " << score << "\n";
+	std::cout << "[score]       : " << score << "\n";
 	// nw->FPrintWeightMatrix();
 	// nw->FPrintBackMatrix();
-	std::cout << "[find]       : " << alignments.size() << "\n";
-	print_vector_pair_a(alignments);
+	std::cout << "[find]        : " << alignments.size() << "\n";
+	/* print_vector_pair_a(alignments);
+	std::cout << "-------\n";
+	print_vector_pair_a(balignments);*/
+
+	std::cout << "[n alignments]:\t" << alignments.size() << "\n";
+	std::cout << "[b alignments]:\t" << balignments.size() << "\n";
 
 	delete nw;
 	return 0;
