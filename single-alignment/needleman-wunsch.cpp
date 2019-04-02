@@ -1,7 +1,7 @@
 #include <iostream>
 #include <utility>
-#include<chrono>
-#include<stdio.h>
+#include <chrono>
+#include <stdio.h>
 #include "src/needleman-wunsch.h"
 
 using namespace std::chrono;
@@ -27,11 +27,12 @@ int main(int argc, char const *argv[]){
 
 	high_resolution_clock::time_point tinit;
 	high_resolution_clock::time_point tend;
+	duration<double> time_span;
 
 	tinit = high_resolution_clock::now();
 		score = nw->FMakeMatrix();
 	tend = high_resolution_clock::now();
-	duration<double> time_span = duration_cast<duration<double>>(tend - tinit);
+	time_span = duration_cast<duration<double>>(tend - tinit);
 	std::cout << "[time matrix] : " << time_span.count() << " s\n";
 	
 	tinit = high_resolution_clock::now();

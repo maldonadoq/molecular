@@ -1,6 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <stdio.h>
 #include "src/star.h"
+
+using namespace std::chrono;
 
 int main(int argc, char const *argv[]){
 
@@ -20,18 +24,36 @@ int main(int argc, char const *argv[]){
 
 	TStar *s = new TStar(match, mismatch, gap);
 	s->FSetDna(dnas);
-	s->FScores();	
-	alignment = s->FGetMultipleAlignment();
+
+	high_resolution_clock::time_point tinit;
+	high_resolution_clock::time_point tend;
+	duration<double> time_span;
+
+	tinit = high_resolution_clock::now();
+		s->FScores();
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[scores]    : " << time_span.count() << " s\n";	
+	
+	tinit = high_resolution_clock::now();
+		alignment = s->FGetMultipleAlignment();
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[multiple]  : " << time_span.count() << " s\n";
 
 	/*alignment.push_back("MQPILLLV");
 	alignment.push_back("MLR-LL--");
 	alignment.push_back("MK-ILLL-");
 	alignment.push_back("MPPVLILV");*/
 
-	score = s->FSumPairs(alignment);
+	tinit = high_resolution_clock::now();
+		score = s->FSumPairs(alignment);
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[pair's sum]: " << time_span.count() << " s\n";	
 
-	std::cout << "[score]: " << score << "\n";
-	print_vector_t(alignment);
+	std::cout << "[score]     : " << score << "\n";
+	// print_vector_t(alignment);
 	// s->FPrintScores();
 
 	delete s;

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <utility>
-#include<chrono>
-#include<stdio.h>
+#include <chrono>
+#include <stdio.h>
 #include "src/smith-waterman.h"
 
 using namespace std::chrono;
