@@ -20,7 +20,7 @@ public:
 	}
 
 	TNeedlemanWunsch(int _match, int _mismatch, int _gap): TAlignment(_match, _mismatch, _gap){	}
-	TNeedlemanWunsch(){	};
+	TNeedlemanWunsch(): TAlignment(){	};
 	~TNeedlemanWunsch(){	};
 	
 	int  FMakeMatrix();

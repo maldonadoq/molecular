@@ -17,7 +17,7 @@ protected:
 	unsigned n, m;						// matrix
 	int match_score;					// match score
 	int mismatch_score;					// mismatch score
-	int gap_score;						// gap score	
+	int gap_score;						// gap score
 public:	
 	int  **m_dp;				// weight matrix
 	char ***m_back;				// matrix to do the traceback
