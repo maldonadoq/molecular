@@ -71,4 +71,10 @@ void print_n(T m, unsigned n){
 	std::cout << "\n";
 }
 
+template<class T>
+void print_vector_t(std::vector<T> vec){
+	for(unsigned i=0; i<vec.size(); i++)
+		std::cout << vec[i] << "\n";
+}
+
 #endif
