@@ -31,7 +31,11 @@ public:
 	unsigned FMaxSize(unsigned);
 	std::vector<std::string> FGetMultipleAlignment();
 
-	~TStar(){	}
+	~TStar(){
+		m_dnas.clear();
+		m_scores.clear();
+		delete m_nw;		
+	}
 };
 
 void TStar::FSetDna(std::vector<std::string> _dnas){

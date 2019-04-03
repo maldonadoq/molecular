@@ -53,7 +53,7 @@ int main(int argc, char const *argv[]){
 	std::cout << "[pair's sum]: " << time_span.count() << " s\n";	
 
 	std::cout << "[score]     : " << score << "\n";
-	// print_vector_t(alignment);
+	print_vector_t(alignment);
 	// s->FPrintScores();
 
 	delete s;
