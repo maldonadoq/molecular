@@ -116,25 +116,28 @@ float TAlignment::FGetPenalty(std::pair<std::string, std::string> _align, float 
 }
 
 Avector TAlignment::FGetBestAlignment(Avector _al, float _p, float _q){
-	Avector vtmp;
-	std::vector<float> vpenalty;
+	Avector vtmp;	
+	if(_q < _p){
+		std::vector<float> vpenalty;
+		std::pair<std::string, std::string> talign = _al[0];
+		float pmin = FGetPenalty(_al[0],_p,_q);
+		float ptmp;
+		vpenalty.push_back(pmin);
 
-	std::pair<std::string, std::string> talign = _al[0];
-	float pmin = FGetPenalty(_al[0],_p,_q);
-	float ptmp;
-	vpenalty.push_back(pmin);
-
-	for(unsigned i=1; i<_al.size(); i++){
-		ptmp = FGetPenalty(_al[i],_p,_q);
-		vpenalty.push_back(ptmp);
-		if(ptmp < pmin){
-			pmin = ptmp;
+		for(unsigned i=1; i<_al.size(); i++){
+			ptmp = FGetPenalty(_al[i],_p,_q);
+			vpenalty.push_back(ptmp);
+			if(ptmp < pmin){
+				pmin = ptmp;
+			}
 		}
-	}
 
-	for(unsigned i=1; i<vpenalty.size(); i++){
-		if(vpenalty[i] == pmin)
-			vtmp.push_back(_al[i]);
+		// std::cout << "penalty: " << pmin << "\n";
+
+		for(unsigned i=0; i<vpenalty.size(); i++){
+			if(vpenalty[i] == pmin)
+				vtmp.push_back(_al[i]);
+		}
 	}
 
 	return vtmp;

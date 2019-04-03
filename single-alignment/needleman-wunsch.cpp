@@ -7,6 +7,9 @@
 using namespace std::chrono;
 
 int main(int argc, char const *argv[]){
+	// std::string dnaa = "ACGGTGCAGTCACCAGGCGGTGCAGTCACCATAACGGTGCAGTCACCAGGCGGTGCAGTCACCAGCAACGGTGCAGTCACCAGGCGAAGTGCAGTCACC";	
+	// std::string dnab = "ACGGTGCAGTCACCATTCGGTGCAGTCACCAAAAGGTGCATAACCAGGCGGTGCAGTCACCAGCAACTTTGCAGGGCAGGCGAAGTGCAGTCATT";
+
 	std::string dnaa = "ACGGTGCACAAGTTCACCAGTTGAACAAATTCGGTGCAGTCACCATAACGGTGCAGTCACCAGGCGGTGCAGTCACCCGGCGGTCGGTGCAGCATGCAAGCAACGGTGCAGTCACCAGGCACCAGTGCACAAGTTCACCAGTTTAACGAAGTGCAGTCACC";	
 	std::string dnab = "ACCGTGCAGTTGAACATCGGTGCAGAATTCGGTGCAGTCACCATAACGGTCGGTGCAGTGCAGTCACCAGGCGGTGCAGTCACCCGGCGGTCGGTGCAGCATGCAAGCAACGGTGCAGTCACCAGGCACCATCAGTCACCAGGCACCACCAGCGGTGCAG";
 
@@ -14,10 +17,10 @@ int main(int argc, char const *argv[]){
 	int mismatch = 1;
 	int gap      = 2;
 
-	float p = 4;
-	float q = 2;
+	float p = 5;
+	float q = 3;
 
-	unsigned n 	 = 100;
+	unsigned n 	 = 20;
 
 	int score;
 	std::vector<std::pair<std::string,std::string> > alignments;
@@ -51,9 +54,10 @@ int main(int argc, char const *argv[]){
 	// nw->FPrintWeightMatrix();
 	// nw->FPrintBackMatrix();
 	std::cout << "[find]        : " << alignments.size() << "\n";
-	/* print_vector_pair_a(alignments);
-	std::cout << "-------\n";
-	print_vector_pair_a(balignments);*/
+	// print_vector_pair_a(alignments);
+	
+	std::cout << "----less penalty----\n";
+	print_vector_pair_a(balignments);
 
 	std::cout << "[n alignments]:\t" << alignments.size() << "\n";
 	std::cout << "[b alignments]:\t" << balignments.size() << "\n";
