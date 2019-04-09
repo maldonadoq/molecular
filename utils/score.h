@@ -3,21 +3,21 @@
 
 #include <utility>
 
-class TScoreAlignment{
+class TPairwiseAlignment{
 public:
 	int m_score;
 	std::pair<std::string, std::string> m_alignment;
-	TScoreAlignment(int _score, std::pair<std::string, std::string> _alignment){
+	TPairwiseAlignment(int _score, std::pair<std::string, std::string> _alignment){
 		this->m_score = _score;
 		this->m_alignment = _alignment;
 	}
 
-	TScoreAlignment(){
+	TPairwiseAlignment(){
 		this->m_score = 0;
 		this->m_alignment = std::make_pair("","");
 	}
 
-	friend std::ostream& operator<< (std::ostream & out, TScoreAlignment &c){
+	friend std::ostream& operator<< (std::ostream & out, TPairwiseAlignment &c){
 		out << "score: " << c.m_score << "\nalign1: " << c.m_alignment.first << "\nalign2: " << c.m_alignment.second;
 		return out;
    	}

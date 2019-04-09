@@ -28,7 +28,7 @@ public:
 	void FDFS(std::pair<int, int>, std::pair<int,int>, bool **, std::vector<std::pair<int, int> > &,
 		std::vector<std::vector<std::pair<int, int> > > &, bool &);
 
-	TScoreAlignment FGetScoreAlignment(std::string, std::string);
+	TPairwiseAlignment FGetScoreAlignment(std::string, std::string);
 };
 
 int TNeedlemanWunsch::FMakeMatrix(){
@@ -67,14 +67,14 @@ int TNeedlemanWunsch::FMakeMatrix(){
 	return this->m_dp[n-1][m-1];
 }
 
-TScoreAlignment TNeedlemanWunsch::FGetScoreAlignment(std::string _dnaa, std::string _dnab){
+TPairwiseAlignment TNeedlemanWunsch::FGetScoreAlignment(std::string _dnaa, std::string _dnab){
 	FInit(_dnaa, _dnab);
 	int tscore = FMakeMatrix();
 	std::vector<std::pair<std::string,std::string> > talignments = FGlobalOptimum(1);
 
 	delete []this->m_dp;
 	delete []this->m_back;
-	return TScoreAlignment(tscore, talignments[0]);
+	return TPairwiseAlignment(tscore, talignments[0]);
 }
 
 std::vector<std::pair<std::string,std::string> > TNeedlemanWunsch::FGlobalOptimum(unsigned _n){
