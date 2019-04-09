@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]){
 	duration<double> time_span;
 
 	tinit = high_resolution_clock::now();
-		s->FScores();
+		s->FAligments();
 	tend = high_resolution_clock::now();
 	time_span = duration_cast<duration<double>>(tend - tinit);
 	std::cout << "[scores]    : " << time_span.count() << " s\n";	
