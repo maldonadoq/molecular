@@ -15,21 +15,51 @@ class TNeedlemanWunsch: public TAlignment{
 public:
 	unsigned m_qp;
 	TNeedlemanWunsch(std::string _dnaa, std::string _dnab,
-	int _match, int _mismatch, int _gap): TAlignment(_dnaa,_dnab,_match,_mismatch,_gap){
+	int _match, int _mismatch, int _gap){
 		this->m_qp = 0;
+
+		this->match_score    = _match;
+		this->mismatch_score = _mismatch;
+		this->gap_score      = _gap;
+		
+		FInit(_dnaa, _dnab);
 	}
 
 	TNeedlemanWunsch(int _match, int _mismatch, int _gap): TAlignment(_match, _mismatch, _gap){	}
 	TNeedlemanWunsch(): TAlignment(){	};
 	~TNeedlemanWunsch(){	};
-	
+
+	void FInit(std::string, std::string);
 	int  FMakeMatrix();
 	std::vector<std::pair<std::string,std::string> > FGlobalOptimum(unsigned);
-	void FDFS(std::pair<int, int>, std::pair<int,int>, bool **, std::vector<std::pair<int, int> > &,
+	void FDFS(std::pair<int, int>, std::pair<int,int>, std::vector<std::pair<int, int> > &,
 		std::vector<std::vector<std::pair<int, int> > > &, bool &);
 
 	TPairwiseAlignment FGetScoreAlignment(std::string, std::string);
 };
+
+void TNeedlemanWunsch::FInit(std::string _dnaa, std::string _dnab){
+	if((_dnaa.size() <  TMAX) and (_dnab.size() < TMAX)){
+		this->m_dna[0] = _dnaa;
+		this->m_dna[1] = _dnab;
+
+		this->n = m_dna[0].size()+1;
+		this->m = m_dna[1].size()+1;
+	
+		this->m_dp   = new int*[this->n];
+		this->m_back = new char**[this->n];
+		for(unsigned i=0; i<this->n; i++){
+			this->m_dp[i] = new int[this->m];
+			this->m_back[i] = new char*[this->m];
+			for(unsigned j=0; j<this->m; j++){
+				this->m_back[i][j] = new char[PATH+1];
+				for(unsigned k=0; k<PATH+1; k++){
+					this->m_back[i][j][k] = '0';
+				}
+			}
+		}
+	}
+}
 
 int TNeedlemanWunsch::FMakeMatrix(){
 	// Init Matrix
@@ -84,19 +114,10 @@ std::vector<std::pair<std::string,std::string> > TNeedlemanWunsch::FGlobalOptimu
 
 	this->m_qp = _n;
 
-	// pull boolean matrix [m][n]
-	bool **visited = new bool*[n];
-	for(unsigned i=0; i<n; i++){
-		visited[i] = new bool[m];
-		for(unsigned j=0; j<m; j++)
-			visited[i][j] = false;
-	}
-
 	std::vector<std::pair<int, int> > mpath;
 	std::vector<std::vector<std::pair<int, int> > > mpaths;
 	bool end = false;
-	FDFS(src, trg, visited, mpath, mpaths, end);
-	delete []visited;
+	FDFS(src, trg, mpath, mpaths, end);
 
 	std::vector<std::pair<std::string, std::string> > alignments;
 	std::pair<std::string, std::string> alignm;
@@ -115,13 +136,8 @@ std::vector<std::pair<std::string,std::string> > TNeedlemanWunsch::FGlobalOptimu
 		for(int j=mpaths[i].size()-2; j>=0; j--){
 			tmp = mpaths[i][j];
 
-			// std::cout << "[" << tmp.first << "," << tmp.second << "] ";
-
-			if(tmp.first == ii) alignm.first += '-';
-			else alignm.first += m_dna[0][tmp.first-1];
-
-			if(tmp.second == jj) alignm.second += '-';
-			else alignm.second += m_dna[1][tmp.second-1];
+			alignm.first += (tmp.first == ii)? '-': m_dna[0][tmp.first-1];
+			alignm.second += (tmp.second == jj)? '-': m_dna[1][tmp.second-1];
 
  			ii = tmp.first;	
  			jj = tmp.second;
@@ -136,10 +152,10 @@ std::vector<std::pair<std::string,std::string> > TNeedlemanWunsch::FGlobalOptimu
 }
 
 void TNeedlemanWunsch::FDFS(std::pair<int, int> _src, std::pair<int, int> _trg,
-	bool ** _visited, std::vector<std::pair<int, int> > &_path,
+	std::vector<std::pair<int, int> > &_path,
 	std::vector<std::vector<std::pair<int, int> > > &_mpaths, bool &_end){
 
-	_visited[_src.first][_src.second] = true;
+	m_back[_src.first][_src.second][PATH] = '1';
 	_path.push_back(_src);
 
 	if(_src == _trg){
@@ -151,28 +167,17 @@ void TNeedlemanWunsch::FDFS(std::pair<int, int> _src, std::pair<int, int> _trg,
 		std::pair<int, int> tmp;
 		for(unsigned i=0; i<PATH; i++){
 			if(m_back[_src.first][_src.second][i] == '1' and !_end){
-				switch(i){
-					case 0:
-						tmp = std::make_pair(_src.first,   _src.second-1);
-						break;
-					case 1:
-						tmp = std::make_pair(_src.first-1, _src.second-1);
-						break;
-					case 2:
-						tmp = std::make_pair(_src.first-1, _src.second);
-						break;
-				}
-				if(tmp.first>=0 and tmp.second>=0){
-					if(!_visited[tmp.first][tmp.second]){
-						FDFS(tmp, _trg, _visited, _path, _mpaths, _end);
-					}
+				tmp = std::make_pair(_src.first+DIRECTION[i][0], _src.second+DIRECTION[i][1]);
+
+				if(m_back[tmp.first][tmp.second][PATH] == '0'){
+					FDFS(tmp, _trg, _path, _mpaths, _end);
 				}
 			}
 		}
 	}
 
 	_path.pop_back();
-	_visited[_src.first][_src.second] = false;
+	m_back[_src.first][_src.second][PATH] = '0';
 }
 
 #endif

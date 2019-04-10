@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]){
 	float p = 5;
 	float q = 3;
 
-	unsigned n 	 = 20;
+	unsigned n 	 = 1000000;
 
 	int score;
 	std::vector<std::pair<std::string,std::string> > alignments;
@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]){
 	// print_vector_pair_a(alignments);
 	
 	std::cout << "----less penalty----\n";
-	print_vector_pair_a(balignments);
+	// print_vector_pair_a(balignments);
 
 	std::cout << "[n alignments]:\t" << alignments.size() << "\n";
 	std::cout << "[b alignments]:\t" << balignments.size() << "\n";

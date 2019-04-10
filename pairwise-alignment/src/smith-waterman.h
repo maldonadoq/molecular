@@ -102,17 +102,7 @@ std::vector<std::vector<std::pair<int, int> > > TSmithWaterman::FBFS(std::pair<u
 		else{
 			for(unsigned i=0; i<PATH; i++){
 				if(m_back[last.first][last.second][i] == '1'){
-					switch(i){
-						case 0:
-							tmp = std::make_pair(last.first,   last.second-1);
-							break;
-						case 1:
-							tmp = std::make_pair(last.first-1, last.second-1);
-							break;
-						case 2:
-							tmp = std::make_pair(last.first-1, last.second);
-							break;
-					}
+					tmp = std::make_pair(last.first+DIRECTION[i][0], last.second+DIRECTION[i][1]);
 
 					if(is_not_visited(path, tmp)){
 						tpath = path;
@@ -124,10 +114,14 @@ std::vector<std::vector<std::pair<int, int> > > TSmithWaterman::FBFS(std::pair<u
 		}
 	}
 
+	path.clear();
+	tpath.clear();
+
 	return mpaths;
 }
 
 std::vector<std::pair<std::string,std::string> > TSmithWaterman::FLocalOptimum(unsigned _n){
+	
 	std::vector<std::pair<std::string, std::string> > alignments;
 	std::vector<std::vector<std::pair<int, int> > > paths;
 	std::vector<std::vector<std::pair<int, int> > > tpaths;
@@ -158,11 +152,9 @@ std::vector<std::pair<std::string,std::string> > TSmithWaterman::FLocalOptimum(u
 		
 		for(int j=paths[i].size()-2; j>=0; j--){
 			tmp = paths[i][j];
-			if(tmp.first == ii) alignm.first += '-';
-			else alignm.first += m_dna[0][tmp.first-1];
 
-			if(tmp.second == jj) alignm.second += '-';
-			else alignm.second += m_dna[1][tmp.second-1];
+			alignm.first += (tmp.first == ii)? '-': m_dna[0][tmp.first-1];
+			alignm.second += (tmp.second == jj)? '-': m_dna[1][tmp.second-1];
 
  			ii = tmp.first;	
  			jj = tmp.second;

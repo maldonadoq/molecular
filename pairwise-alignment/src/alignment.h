@@ -8,6 +8,7 @@
 
 #define TMAX 1000
 #define PATH 3
+int DIRECTION[3][2] = {{0,-1},{-1,-1},{-1,0}};
 
 typedef std::vector<std::pair<std::string, std::string> > Avector;
 
@@ -31,7 +32,7 @@ public:
 	void FPrintBackMatrix();
 	void FPrintWeightMatrix();
 	int  FSimilarity(char, char);
-	void FInit(std::string, std::string);
+	virtual void FInit(std::string, std::string);
 
 	Avector FGetBestAlignment(Avector, float, float);
 	float FGetPenalty(std::pair<std::string, std::string>, float, float);
