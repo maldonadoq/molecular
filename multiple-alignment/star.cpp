@@ -52,7 +52,7 @@ int main(int argc, char const *argv[]){
 	time_span = duration_cast<duration<double>>(tend - tinit);
 	std::cout << "[pair's sum]: " << time_span.count() << " s\n";	
 
-	std::cout << "[score]     : " << score << "\n";
+	std::cout << "[score]     : " << score << "\n\n";
 	print_vector_t(alignment);
 	// s->FPrintScores();
 
