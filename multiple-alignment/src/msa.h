@@ -1,7 +1,7 @@
 #ifndef _MSA_H_
 #define _MSA_H_
 
-#include "../../single-alignment/src/needleman-wunsch.h"
+#include "../../pairwise-alignment/src/needleman-wunsch.h"
 #include "../../utils/score.h"
 #include "../../utils/print.h"
 

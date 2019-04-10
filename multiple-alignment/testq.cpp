@@ -79,6 +79,9 @@ int main(int argc, char const *argv[]){
 
 	std::cout << "\n\n";
 
+	std::cout << "bool: " << sizeof(bool) << "\n";
+	std::cout << "char: " << sizeof(char) << "\n";
+
 	PrintM(q);
 
 	return 0;
