@@ -4,16 +4,16 @@
 #include "../../pairwise-alignment/src/needleman-wunsch.h"
 #include "../../utils/score.h"
 #include "../../utils/print.h"
+#include <thread>
 
 class TMsa{
-protected:
-	TNeedlemanWunsch *m_nw;
-	std::vector<std::string> m_dnas;
-	std::vector<std::vector<TPairwiseAlignment> > m_matrix_alignments;
+protected:	
+	static std::vector<std::string> m_dnas;
+	static std::vector<std::vector<TPairwiseAlignment> > m_matrix_alignments;
 
-	int match_score;					// match score
-	int mismatch_score;					// mismatch score
-	int gap_score;						// gap score	
+	static int match_score;					// match score
+	static int mismatch_score;				// mismatch score
+	static int gap_score;					// gap score	
 
 public:
 	TMsa(int, int, int);
@@ -22,16 +22,24 @@ public:
 	virtual int  FSumPairs(std::vector<std::string >);
 	virtual void FSetDna(std::vector<std::string>);
 	virtual int  FSimilarity(char, char);
-	virtual void FAligments();
+	virtual void FAligments();	
 	
 	virtual unsigned FGetMaximunIdx();
+
+	static void  ThreadAlignment(unsigned, unsigned);
 };
+
+std::vector<std::string> TMsa::m_dnas;
+std::vector<std::vector<TPairwiseAlignment> > TMsa::m_matrix_alignments;
+int TMsa::match_score;
+int TMsa::mismatch_score;
+int TMsa::gap_score;
 
 TMsa::TMsa(int _match, int _mismatch, int _gap){
 	this->match_score    = _match;
 	this->mismatch_score = _mismatch;
 	this->gap_score      = _gap;
-	this->m_nw = new TNeedlemanWunsch(match_score, mismatch_score, gap_score);
+	// this->m_nw = new TNeedlemanWunsch(match_score, mismatch_score, gap_score);
 }
 
 void TMsa::FSetDna(std::vector<std::string> _dnas){
@@ -70,15 +78,27 @@ int TMsa::FSumPairs(std::vector<std::string > _alignments){
 	return score;
 }
 
-void TMsa::FAligments(){
+void TMsa::ThreadAlignment(unsigned i, unsigned _j){
 	TPairwiseAlignment tmp;
-	for(unsigned i=0; i<m_dnas.size(); i++){
-		for(unsigned j=i+1; j<m_dnas.size(); j++){
-			tmp = m_nw->FGetScoreAlignment(m_dnas[i], m_dnas[j]);
-			this->m_matrix_alignments[i][j] = tmp;
-			this->m_matrix_alignments[j][i] = TPairwiseAlignment(tmp.m_score,
-				std::make_pair(tmp.m_alignment.second, tmp.m_alignment.first));
-		}
+	TNeedlemanWunsch nw(match_score, mismatch_score, gap_score);
+
+	for(unsigned j=_j; j<m_dnas.size(); j++){
+		tmp = nw.FGetScoreAlignment(m_dnas[i], m_dnas[j]);
+		m_matrix_alignments[i][j] = tmp;
+		m_matrix_alignments[j][i] = TPairwiseAlignment(tmp.m_score,
+			std::make_pair(tmp.m_alignment.second, tmp.m_alignment.first));
+	}	
+}
+
+void TMsa::FAligments(){
+	std::thread th[m_dnas.size()-1];
+
+	for(unsigned i=0; i<m_dnas.size()-1; i++){
+		th[i] = std::thread(this->ThreadAlignment, i, i+1);
+	}
+
+	for(unsigned i=0; i<m_dnas.size()-1; i++){
+		th[i].join();
 	}
 }
 
@@ -109,7 +129,6 @@ unsigned TMsa::FGetMaximunIdx(){
 TMsa::~TMsa(){
 	m_dnas.clear();
 	m_matrix_alignments.clear();
-	delete m_nw;	
 }
 
 #endif
