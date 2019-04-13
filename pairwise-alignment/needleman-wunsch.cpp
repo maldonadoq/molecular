@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]){
 	float p = 5;
 	float q = 3;
 
-	unsigned n 	 = 1000000;
+	unsigned n = 100;
 
 	int score;
 	std::vector<std::pair<std::string,std::string> > alignments;

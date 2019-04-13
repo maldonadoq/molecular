@@ -102,8 +102,8 @@ TPairwiseAlignment TNeedlemanWunsch::FGetScoreAlignment(std::string _dnaa, std::
 	int tscore = FMakeMatrix();
 	std::vector<std::pair<std::string,std::string> > talignments = FGlobalOptimum(1);
 
-	delete []this->m_dp;
-	delete []this->m_back;
+	//delete []this->m_dp;
+	//delete []this->m_back;
 	return TPairwiseAlignment(tscore, talignments[0]);
 }
 
