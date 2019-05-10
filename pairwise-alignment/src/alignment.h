@@ -140,6 +140,9 @@ Avector TAlignment::FGetBestAlignment(Avector _al, float _p, float _q){
 				vtmp.push_back(_al[i]);
 		}
 	}
+	else{
+		std::cout << "Warning: p must be greater than q\n";
+	}
 
 	return vtmp;
 }
