@@ -33,7 +33,7 @@ std::vector<std::string> TStar::FGetMultipleAlignment(){
 	std::vector<std::string> align;
 
 	unsigned idx = FGetMaximunIdx();	
-	// std::cout << "idx: " << idx << "\n";
+	std::cout << "idx: " << idx << "\n";	
 
 	unsigned size = FMaxSize(idx);
 	// std::cout << "size: " << size << "\n";
@@ -44,6 +44,7 @@ std::vector<std::string> TStar::FGetMultipleAlignment(){
 			if(!init){
 				align.push_back(str_complete(m_matrix_alignments[idx][j].m_alignment.first ,'-',size));
 				align.push_back(str_complete(m_matrix_alignments[idx][j].m_alignment.second,'-',size));
+				std::cout << "align\n" << m_matrix_alignments[idx][j].m_alignment.first << "\n";
 				init =true;
 			}
 			else{
