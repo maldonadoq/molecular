@@ -1,45 +1,42 @@
-#ifndef _CLUSTER_H_
-#define _CLUSTER_H_
+#ifndef _AGGLOMERATIVE_H_
+#define _AGGLOMERATIVE_H_
 
 #include <iostream>
 #include <utility>
 #include <vector>
 #include <map>
+#include <string>
+#include <iomanip>
 
 template <class T, class H, class C>
-class TCluster{
+class TAgglomerative{
 private:
 	C m_op;
 	std::map<H, std::map<H, T> > m_distances;
 	std::vector<H> m_headers;
 
 public:
-	TCluster();
-	~TCluster();
+	TAgglomerative();
+	~TAgglomerative();
 
-	void SetHeader(std::vector<H>);
-	void SetDistance(std::vector<std::vector<T > >);
-	void PrintMap();
-	void Cluster();
+	void Init(std::vector<std::vector<T > >, std::vector<H>);
+	void Cluster(unsigned);
 	std::pair<int, int> FindMin();
 };
 
 template <class T, class H, class C>
-TCluster<T,H,C>::TCluster(){
+TAgglomerative<T,H,C>::TAgglomerative(){
 
 }
 
-template <class T, class H, class C>
-void TCluster<T,H,C>::SetHeader(std::vector<H> _headers){
-	this->m_headers = _headers;
-}
 
 template <class T, class H, class C>
-void TCluster<T,H,C>::SetDistance(std::vector<std::vector<T > > _distances){
-	if(_distances.size() != m_headers.size()){
-		std::cout << "Error: matrix should be [" << m_headers.size() << "x" << m_headers.size() << "]\n";
+void TAgglomerative<T,H,C>::Init(std::vector<std::vector<T > > _distances, std::vector<H> _headers){
+	if(_distances.size() != _headers.size()){
+		std::cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
 		return;
 	}
+	m_headers = _headers;
 
 	unsigned i,j;
 	for(i=0; i<_distances.size(); i++){
@@ -51,7 +48,7 @@ void TCluster<T,H,C>::SetDistance(std::vector<std::vector<T > > _distances){
 }
 
 template <class T, class H, class C>
-std::pair<int, int> TCluster<T,H,C>::FindMin(){
+std::pair<int, int> TAgglomerative<T,H,C>::FindMin(){
 	std::pair<int, int> pmin = std::make_pair(1,0);
 	float tmin = m_distances[m_headers[1]][m_headers[0]];
 
@@ -70,7 +67,7 @@ std::pair<int, int> TCluster<T,H,C>::FindMin(){
 }
 
 template <class T, class H, class C>
-void TCluster<T,H,C>::Cluster(){
+void TAgglomerative<T,H,C>::Cluster(unsigned _n){
 
 	std::map<H, std::map<H, T> > _distances;
 	std::vector<H> _headers;
@@ -80,10 +77,7 @@ void TCluster<T,H,C>::Cluster(){
 	T value;
 
 	T hi, hj;
-	while(m_headers.size() > 1){
-		PrintMap();
-		std::cout << "\n";
-
+	while(m_headers.size() > _n){
 		pmin = FindMin();
 		t1 = std::min(pmin.first, pmin.second);
 		t2 = std::max(pmin.first, pmin.second);
@@ -91,6 +85,9 @@ void TCluster<T,H,C>::Cluster(){
 		_headers = m_headers;
 
 		cl = _headers[t1]+_headers[t2];
+		// cl = "("+_headers[t1]+_headers[t2]+")";
+		// std::cout << cl << "\n";
+
 		m_headers[t1] = cl;
 		m_headers.erase(m_headers.begin() + t2);
 
@@ -112,29 +109,15 @@ void TCluster<T,H,C>::Cluster(){
 		}
 		this->m_distances = _distances;
 		_distances.clear();
+
+		std::cout << m_headers.size() << "\n";
 	}
 }
 
 template <class T, class H, class C>
-void TCluster<T,H,C>::PrintMap(){
-	unsigned i,j;
-
-	/*for(i=0; i<m_headers.size(); i++){
-		std::cout << m_headers[i] << "\t";
-	}
-	std::cout << "\n";*/
-
-	for(i=0; i<m_headers.size(); i++){
-		for(j=0; j</*=i-1*/m_headers.size(); j++){
-			printf("%.2f ", m_distances[m_headers[i]][m_headers[j]]);
-		}
-		std::cout << "\n";
-	}
-}
-
-template <class T, class H, class C>
-TCluster<T,H,C>::~TCluster(){
+TAgglomerative<T,H,C>::~TAgglomerative(){
 	this->m_distances.clear();
+	this->m_headers.clear();
 }
 
 #endif
