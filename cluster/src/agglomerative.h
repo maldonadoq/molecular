@@ -20,8 +20,9 @@ public:
 	~TAgglomerative();
 
 	void Init(std::vector<std::vector<T > >, std::vector<H>);
-	void Cluster(unsigned);
+	void Run(unsigned);
 	std::pair<int, int> FindMin();
+	std::vector<H> GetClusters();
 };
 
 template <class T, class H, class C>
@@ -38,6 +39,7 @@ void TAgglomerative<T,H,C>::Init(std::vector<std::vector<T > > _distances, std::
 	}
 	m_headers = _headers;
 
+	m_distances.clear();
 	unsigned i,j;
 	for(i=0; i<_distances.size(); i++){
 		for(j=0; j<_distances[i].size(); j++){
@@ -67,51 +69,39 @@ std::pair<int, int> TAgglomerative<T,H,C>::FindMin(){
 }
 
 template <class T, class H, class C>
-void TAgglomerative<T,H,C>::Cluster(unsigned _n){
-
-	std::map<H, std::map<H, T> > _distances;
-	std::vector<H> _headers;
+void TAgglomerative<T,H,C>::Run(unsigned _n){
 	std::pair<int, int> pmin;
-	int t1, t2;
-	std::string cl;
+	std::string cl, cl1, cl2;
 	T value;
 
 	T hi, hj;
 	while(m_headers.size() > _n){
 		pmin = FindMin();
-		t1 = std::min(pmin.first, pmin.second);
-		t2 = std::max(pmin.first, pmin.second);
 
-		_headers = m_headers;
-
-		cl = _headers[t1]+_headers[t2];
-		// cl = "("+_headers[t1]+_headers[t2]+")";
-		// std::cout << cl << "\n";
-
-		m_headers[t1] = cl;
-		m_headers.erase(m_headers.begin() + t2);
+		cl1 = m_headers[pmin.first];
+		cl2 = m_headers[pmin.second];
+		cl = cl1 + "-" + cl2;
+		
+		m_headers[std::min(pmin.first, pmin.second)] = cl;
+		m_headers.erase(m_headers.begin() + std::max(pmin.first, pmin.second));
 
 		for(unsigned i=0; i<m_headers.size(); i++){
-			hi = m_distances[_headers[pmin.first ]][m_headers[i]];
-			hj = m_distances[_headers[pmin.second]][m_headers[i]];
+			hi = m_distances[cl1][m_headers[i]];
+			hj = m_distances[cl2][m_headers[i]];
 			value = m_op(hi, hj);
 
-			_distances[cl][m_headers[i]] = value;
-			_distances[m_headers[i]][cl] = value;
-
-			for(unsigned j=0; j<m_headers.size(); j++){
-				if(!_distances[m_headers[i]][m_headers[j]]){
-
-					_distances[m_headers[i]][m_headers[j]] = m_distances[m_headers[i]][m_headers[j]];
-					_distances[m_headers[j]][m_headers[i]] = m_distances[m_headers[i]][m_headers[j]];
-				}
-			}
+			m_distances[cl][m_headers[i]] = value;
+			m_distances[m_headers[i]][cl] = value;
 		}
-		this->m_distances = _distances;
-		_distances.clear();
 
-		std::cout << m_headers.size() << "\n";
+		m_distances.erase(cl1);
+		m_distances.erase(cl2);
 	}
+}
+
+template <class T, class H, class C>
+std::vector<H> TAgglomerative<T,H,C>::GetClusters(){
+	return m_headers;
 }
 
 template <class T, class H, class C>
