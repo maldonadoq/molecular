@@ -4,7 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <iomanip>
 
@@ -12,7 +12,7 @@ template <class T, class H, class C>
 class TAgglomerative{
 private:
 	C m_op;
-	std::map<H, std::map<H, T> > m_distances;
+	std::unordered_map<H, std::unordered_map<H, T> > m_distances;
 	std::vector<H> m_headers;
 
 public:
