@@ -7,9 +7,10 @@
 #include <string>
 #include <math.h>
 
-void print_vector(std::vector<float> _v){
+template<class T>
+void print_vector(std::vector<T> _v){
 	for(unsigned i=0; i<_v.size(); i++){
-		std::cout << _v[i] << " ";
+		std::cout << "[" << _v[i] << "]  ";
 	}
 	std::cout << "\n";
 }
