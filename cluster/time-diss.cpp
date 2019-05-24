@@ -44,6 +44,8 @@ int main(int argc, char const *argv[]){
 				diss->Run(ntest_cluster[j]);
 			tend = high_resolution_clock::now();
 			time_span = duration_cast<duration<double>>(tend - tinit);
+			file << " Time: " << time_span.count() << " s\n";
+
 
 			clusters = diss->GetClusters();
 			for(unsigned k=0; k<clusters.size(); k++){
