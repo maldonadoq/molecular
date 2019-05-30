@@ -7,7 +7,7 @@
 
 using namespace std::chrono;
 
-typedef TAgglomerative<float, std::string, TC<float> > Cluster;
+typedef TAgglomerative<TC<float> > Cluster;
 typedef std::vector<float> dvect;
 
 // build: g++ agglomerative.cpp -o agglomerative.out
