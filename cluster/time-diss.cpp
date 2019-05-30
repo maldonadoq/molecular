@@ -8,22 +8,26 @@
 
 using namespace std::chrono;
 
-typedef TDissociative<float, std::string> DC;					// Dissociative Cluster
-typedef std::vector<float> dvect;								// String Vector
+using std::vector;
+using std::string;
+using std::ofstream;
+
+typedef TDissociative DC;			// Dissociative Cluster
+typedef vector<float> dvect;		// String Vector
 
 // build: g++ time-diss.cpp -o time-diss.out
 int main(int argc, char const *argv[]){
-	std::vector<std::string > headers;
-	std::vector<dvect>        distances;
-	std::vector<std::string > clusters;
+	vector<string > headers;
+	vector<dvect>        distances;
+	vector<string > clusters;
 
-	std::ofstream file("../data/Maldonado-Result-Diss.dat");
+	ofstream file("../data/Maldonado-Result-Diss.dat");
 
-	std::string filename = "../data/Diauxic.txt";
+	string filename = "../data/Diauxic.txt";
 	pre_processing_file(filename, distances, headers);
 
 	unsigned ntypes = 3;
-	std::vector<std::string> ntypes_name = {"Single Linkage\n","Complete Linkage\n","Average Linkage\n"};
+	vector<string> ntypes_name = {"Single Linkage\n","Complete Linkage\n","Average Linkage\n"};
 
 	unsigned ntest_size = 4;	
 	int ntest_cluster[ntest_size] = {50, 100, 150, 200};

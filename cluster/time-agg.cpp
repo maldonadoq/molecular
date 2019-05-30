@@ -4,24 +4,28 @@
 #include <stdio.h>
 #include "src/cmp.h"
 #include "src/utils.h"
-#include "src/agglomerative.h"
+#include "src/tagglomerative.h"
 
 using namespace std::chrono;
 
-typedef TAgglomerative<float, std::string, TC1<float> > ACS;	// Agglomerative Single Linkage
-typedef TAgglomerative<float, std::string, TC2<float> > ACC;	// Agglomerative Complete Linkage
-typedef TAgglomerative<float, std::string, TC3<float> > ACA;	// Agglomerative Average Linkage
+using std::cout;
+using std::vector;
+using std::ofstream;
 
-typedef std::vector<float> dvect;								// String Vector
+typedef TAgglomerative<TC1<float> > ACS;	// Agglomerative Single Linkage
+typedef TAgglomerative<TC2<float> > ACC;	// Agglomerative Complete Linkage
+typedef TAgglomerative<TC3<float> > ACA;	// Agglomerative Average Linkage
+
+typedef vector<float> dvect;			// String Vector
 
 int main(int argc, char const *argv[]){
-	std::vector<std::string > headers;
-	std::vector<dvect>        distances;
-	std::vector<std::string > clusters;
+	vector<string> headers;
+	vector<dvect>  distances;
+	vector<string> clusters;
 
-	std::ofstream file("../data/Maldonado-Result-Agg.dat");
+	ofstream file("../data/Maldonado-Result-Agg.dat");
 
-	std::string filename = "../data/Diauxic.txt";
+	string filename = "../data/Diauxic.txt";
 	pre_processing_file(filename, distances, headers);
 
 	unsigned ntypes = 3;
@@ -54,6 +58,7 @@ int main(int argc, char const *argv[]){
 					}
 					file << "\n";
 				}
+				cout << "\n";
 				delete as;
 				break;
 			}
@@ -76,6 +81,7 @@ int main(int argc, char const *argv[]){
 					}
 					file << "\n";
 				}
+				cout << "\n";
 				delete ac;
 				break;
 			}
@@ -98,6 +104,7 @@ int main(int argc, char const *argv[]){
 					}
 					file << "\n";
 				}
+				cout << "\n";
 				delete aa;
 				break;
 			}
