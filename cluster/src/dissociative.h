@@ -4,44 +4,46 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <iomanip>
 
-template <class T, class H>
+using std::unordered_map;
+using std::string;
+using std::vector;
+using std::cout;
+using std::pair;
+
 class TDissociative{
 private:
 	int m_type;
-	std::map<H, std::map<H, T> > m_distances;	
-	std::map<H, T> m_individual_distance;
-	std::vector<H> m_cluster;
+	unordered_map<string, unordered_map<string, float> > m_distances;	
+	unordered_map<string, float> m_individual_distance;
+	vector<string> m_cluster;
 public:
 	TDissociative();
 	~TDissociative();
 
-	void Init(std::vector<std::vector<T > >, std::vector<H>);
+	void Init(vector<vector<float > >, vector<string>);
 	void SetType(int);
-	std::vector<H> GetClusters();
+	vector<string> GetClusters();
 	void Run(int);
 
-	std::pair<H,T> FindMax();
-	T TypeC(std::vector<H>, H);
+	pair<string,float> FindMax();
+	float TypeC(vector<string>, string);
 };
 
-template <class T, class H>
-TDissociative<T,H>::TDissociative(){
+TDissociative::TDissociative(){
 
 }
 
-template <class T, class H>
-void TDissociative<T,H>::SetType(int _type){
+void TDissociative::SetType(int _type){
 	this->m_type = _type;
 }
 
-template <class T, class H>
-void TDissociative<T,H>::Init(std::vector<std::vector<T > > _distances, std::vector<H> _headers){
+void TDissociative::Init(vector<vector<float > > _distances, vector<string> _headers){
 	if(_distances.size() != _headers.size()){
-		std::cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
+		cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
 		return;
 	}
 
@@ -56,7 +58,7 @@ void TDissociative<T,H>::Init(std::vector<std::vector<T > > _distances, std::vec
 		}		
 	}
 
-	T tmin, tmp;
+	float tmin, tmp;
 	for(i=0; i<_distances.size(); i++){
 		tmin = 9999999;
 		for(j=0; j<_distances.size(); j++){
@@ -69,10 +71,9 @@ void TDissociative<T,H>::Init(std::vector<std::vector<T > > _distances, std::vec
 	}
 }
 
-template <class T, class H>
-std::pair<H,T> TDissociative<T,H>::FindMax(){
-	typename std::map<H,T>::iterator it = m_individual_distance.begin();
-	std::pair<H,T> tmax = *it;
+pair<string,float> TDissociative::FindMax(){
+	typename unordered_map<string,float>::iterator it = m_individual_distance.begin();
+	pair<string,float> tmax = *it;
 
 	for(it++; it!=m_individual_distance.end(); it++){
     	if(it->second > tmax.second){
@@ -83,11 +84,10 @@ std::pair<H,T> TDissociative<T,H>::FindMax(){
 	return tmax;
 }
 
-template <class T, class H>
-T TDissociative<T,H>::TypeC(std::vector<H> _vect, H _value){
-	T tval = m_distances[_value][_vect[0]];
-	T tsum = 0;
-	T ttmp;
+float TDissociative::TypeC(vector<string> _vect, string _value){
+	float tval = m_distances[_value][_vect[0]];
+	float tsum = 0;
+	float ttmp;
 
 	for(unsigned i=1; i<_vect.size(); i++){
 		ttmp = m_distances[_value][_vect[i]];
@@ -118,26 +118,25 @@ T TDissociative<T,H>::TypeC(std::vector<H> _vect, H _value){
 	return tval;
 }
 
-template <class T, class H>
-void TDissociative<T,H>::Run(int _n){
-	std::pair<H,T> tmax;
+void TDissociative::Run(int _n){
+	pair<string,float> tmax;
 
-	typename std::map<H,T>::iterator it;
-	T tpr, tnew, tdif, tvalue;
+	typename unordered_map<string,float>::iterator it;
+	float tpr, tnew, tdif, tvalue;
 
-	std::vector<H> rvector;		// remove vector
+	vector<string> rvector;		// remove vector
 
 	unsigned i;
-	H snew;	
-	T tmin;
+	string snew;	
+	float tmin;
 	// int count = 0;
 
 	while((int)m_cluster.size() < (_n-1) and (m_individual_distance.size() > 2)){
 
 		/*for(it=m_individual_distance.begin(); it!=m_individual_distance.end(); it++){
-			std::cout << it->first << " ";
+			cout << it->first << " ";
 		}
-		std::cout << "\n\n";*/
+		cout << "\n\n";*/
 
 		tmax = FindMax();
 		m_individual_distance.erase(tmax.first);
@@ -149,7 +148,7 @@ void TDissociative<T,H>::Run(int _n){
 			tnew = m_distances[tmax.first][it->first];
 			tdif = tpr - tnew;
 
-			/* std::cout << std::setw(4) << std::fixed << std::left << std::setprecision(2) \
+			/* cout << setw(4) << fixed << left << setprecision(2) \
 				<< it->first << "\t" << tpr << "\t" << tnew << "\t" << tdif << "\n"; */
 
 			if(tdif >= 0){				
@@ -193,19 +192,17 @@ void TDissociative<T,H>::Run(int _n){
 	for(it=m_individual_distance.begin(); it!=m_individual_distance.end(); it++){
 		snew += it->first;// +"-";
 	}
-	// std::cout << "\n------------\n";
+	// cout << "\n------------\n";
 	// snew = snew.substr(0,snew.size()-1);
 
 	m_cluster.push_back(snew);
 }
 
-template <class T, class H>
-std::vector<H> TDissociative<T,H>::GetClusters(){
+vector<string> TDissociative::GetClusters(){
 	return m_cluster;
 }
 
-template <class T, class H>
-TDissociative<T,H>::~TDissociative(){
+TDissociative::~TDissociative(){
 	this->m_distances.clear();
 }
 

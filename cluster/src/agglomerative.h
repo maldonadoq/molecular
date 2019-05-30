@@ -8,33 +8,42 @@
 #include <string>
 #include <iomanip>
 
-template <class T, class H, class C>
+using std::unordered_map;
+using std::make_pair;
+using std::string;
+using std::vector;
+using std::cout;
+using std::pair;
+using std::max;
+using std::min;
+
+template <class C>
 class TAgglomerative{
 private:
 	C m_op;
-	std::unordered_map<H, std::unordered_map<H, T> > m_distances;
-	std::vector<H> m_headers;
+	unordered_map<string, unordered_map<string, float> > m_distances;
+	vector<string> m_headers;
 
 public:
 	TAgglomerative();
 	~TAgglomerative();
 
-	void Init(std::vector<std::vector<T > >, std::vector<H>);
+	void Init(vector<vector<float > >, vector<string>);
 	void Run(unsigned);
-	std::pair<int, int> FindMin();
-	std::vector<H> GetClusters();
+	pair<int, int> FindMin();
+	vector<string> GetClusters();
 };
 
-template <class T, class H, class C>
-TAgglomerative<T,H,C>::TAgglomerative(){
+template <class C>
+TAgglomerative<C>::TAgglomerative(){
 
 }
 
 
-template <class T, class H, class C>
-void TAgglomerative<T,H,C>::Init(std::vector<std::vector<T > > _distances, std::vector<H> _headers){
+template <class C>
+void TAgglomerative<C>::Init(vector<vector<float > > _distances, vector<string> _headers){
 	if(_distances.size() != _headers.size()){
-		std::cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
+		cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
 		return;
 	}
 	m_headers = _headers;
@@ -49,9 +58,9 @@ void TAgglomerative<T,H,C>::Init(std::vector<std::vector<T > > _distances, std::
 	}
 }
 
-template <class T, class H, class C>
-std::pair<int, int> TAgglomerative<T,H,C>::FindMin(){
-	std::pair<int, int> pmin = std::make_pair(1,0);
+template <class C>
+pair<int, int> TAgglomerative<C>::FindMin(){
+	pair<int, int> pmin = make_pair(1,0);
 	float tmin = m_distances[m_headers[1]][m_headers[0]];
 
 	int i,j;
@@ -68,13 +77,13 @@ std::pair<int, int> TAgglomerative<T,H,C>::FindMin(){
 	return pmin;
 }
 
-template <class T, class H, class C>
-void TAgglomerative<T,H,C>::Run(unsigned _n){
-	std::pair<int, int> pmin;
-	std::string cl, cl1, cl2;
-	T value;
+template <class C>
+void TAgglomerative<C>::Run(unsigned _n){
+	pair<int, int> pmin;
+	string cl, cl1, cl2;
+	float value;
 
-	T hi, hj;
+	float hi, hj;
 	while(m_headers.size() > _n){
 		pmin = FindMin();
 
@@ -82,8 +91,8 @@ void TAgglomerative<T,H,C>::Run(unsigned _n){
 		cl2 = m_headers[pmin.second];
 		cl = cl1 + "-" + cl2;
 		
-		m_headers[std::min(pmin.first, pmin.second)] = cl;
-		m_headers.erase(m_headers.begin() + std::max(pmin.first, pmin.second));
+		m_headers[min(pmin.first, pmin.second)] = cl;
+		m_headers.erase(m_headers.begin() + max(pmin.first, pmin.second));
 
 		for(unsigned i=0; i<m_headers.size(); i++){
 			hi = m_distances[cl1][m_headers[i]];
@@ -99,13 +108,13 @@ void TAgglomerative<T,H,C>::Run(unsigned _n){
 	}
 }
 
-template <class T, class H, class C>
-std::vector<H> TAgglomerative<T,H,C>::GetClusters(){
+template <class C>
+vector<string> TAgglomerative<C>::GetClusters(){
 	return m_headers;
 }
 
-template <class T, class H, class C>
-TAgglomerative<T,H,C>::~TAgglomerative(){
+template <class C>
+TAgglomerative<C>::~TAgglomerative(){
 	this->m_distances.clear();
 	this->m_headers.clear();
 }
