@@ -1,11 +1,20 @@
 #include <iostream>
 #include <chrono>
 #include <stdio.h>
-#include "src/cmp.h"
 #include "src/utils.h"
 #include "src/agglomerative.h"
 
 using namespace std::chrono;
+
+template<class T>
+class TC{
+public:
+	inline T operator()(T x, T y){
+		return std::min(x,y);
+		// return std::max(x,y);
+		// return (x+y)/2;
+	}
+};
 
 typedef TAgglomerative<TC<float> > Cluster;
 typedef std::vector<float> dvect;
@@ -25,7 +34,7 @@ int main(int argc, char const *argv[]){
 	distances[5] = {1.16, 1.01, 0.55, 0.22, 0.41, 0.00};
 	distances[6] = {1.56, 2.83, 1.86, 2.04, 2.02, 2.05, 0.00};
 
-	unsigned ncluster = 3;
+	unsigned ncluster = 5;
 
 	Cluster *cl = new Cluster();
 

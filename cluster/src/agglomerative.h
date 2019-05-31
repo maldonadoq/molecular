@@ -4,27 +4,23 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <unordered_map>
 #include <string>
-#include <chrono>
 #include <iomanip>
+#include "utils.h"
 
 using namespace std::chrono;
 
-using std::unordered_map;
 using std::make_pair;
 using std::string;
 using std::vector;
 using std::cout;
 using std::pair;
-using std::max;
-using std::min;
 
 template <class C>
 class TAgglomerative{
 private:
 	C m_op;
-	unordered_map<string, unordered_map<string, float> > m_distances;
+	vector<vector<float> > m_distances;
 	vector<string> m_headers;
 
 public:
@@ -52,11 +48,13 @@ void TAgglomerative<C>::Init(vector<vector<float > > _distances, vector<string> 
 	m_headers = _headers;
 
 	m_distances.clear();
+	m_distances = std::vector<vector<float> >(_headers.size(), vector<float>(_headers.size()));
+
 	unsigned i,j;
 	for(i=0; i<_distances.size(); i++){
 		for(j=0; j<_distances[i].size(); j++){
-			m_distances[m_headers[i]][m_headers[j]] = _distances[i][j];
-			m_distances[m_headers[j]][m_headers[i]] = _distances[i][j];
+			m_distances[i][j] = _distances[i][j];
+			m_distances[j][i] = _distances[i][j];
 		}
 	}
 }
@@ -64,18 +62,18 @@ void TAgglomerative<C>::Init(vector<vector<float > > _distances, vector<string> 
 template <class C>
 pair<int, int> TAgglomerative<C>::FindMin(){
 	pair<int, int> pmin = make_pair(1,0);
-	float tmin = m_distances[m_headers[1]][m_headers[0]];
+	float tmin = m_distances[1][0];
 
 	int i,j;
 	for(i=2; i<(int)m_headers.size(); i++){
-		for(j=0; j<=i-1; j++){
-			if(m_distances[m_headers[i]][m_headers[j]] < tmin){
-				tmin = m_distances[m_headers[i]][m_headers[j]];
+		for(j=0; j<i; j++){
+			if(m_distances[i][j] < tmin){
+				tmin = m_distances[i][j];
 				pmin.first  = i;
 				pmin.second = j;
 			}
 		}
-	}	
+	}
 
 	return pmin;
 }
@@ -87,49 +85,39 @@ void TAgglomerative<C>::Run(unsigned _n){
 	float value;
 
 	float hi, hj;
-
-	high_resolution_clock::time_point tinit;
-	high_resolution_clock::time_point tend;
-	duration<double> time_span;
-
-	float tfind = 0;
-	float texec = 0;
+	int tmp;
 
 	while(m_headers.size() > _n){
-		tinit = high_resolution_clock::now();
-			pmin = FindMin();
-		tend = high_resolution_clock::now();
-		time_span = duration_cast<duration<double>>(tend - tinit);
-		tfind += time_span.count();
+		pmin = FindMin();
 
-		tinit = high_resolution_clock::now();
+		if(pmin.first > pmin.second){
+			tmp = pmin.first;
+			pmin.first = pmin.second;
+			pmin.second = tmp;
+		}
 
 		cl1 = m_headers[pmin.first];
 		cl2 = m_headers[pmin.second];
 		cl = cl1 + "-" + cl2;
 		
-		m_headers[min(pmin.first, pmin.second)] = cl;
-		m_headers.erase(m_headers.begin() + max(pmin.first, pmin.second));
+		m_headers[pmin.first] = cl;
+		m_headers.erase(m_headers.begin() + pmin.second);
 
-		for(unsigned i=0; i<m_headers.size(); i++){
-			hi = m_distances[cl1][m_headers[i]];
-			hj = m_distances[cl2][m_headers[i]];
-			value = m_op(hi, hj);
+		for(unsigned i=0; i<m_distances.size(); i++){
+			hi = m_distances[i][pmin.first];
+			hj = m_distances[i][pmin.second];
 
-			m_distances[cl][m_headers[i]] = value;
-			m_distances[m_headers[i]][cl] = value;
+			m_distances[i][pmin.first] = m_op(hi,hj);
+			m_distances[pmin.first][i] = m_op(hi,hj);
 		}
 
-		m_distances.erase(cl1);
-		m_distances.erase(cl2);
-		
-		tend = high_resolution_clock::now();
-		time_span = duration_cast<duration<double>>(tend - tinit);
-		texec += time_span.count();
-	}
+		m_distances.erase(m_distances.begin() + pmin.second);
+		for(unsigned i=0; i<m_distances.size(); i++){
+			m_distances[i].erase(m_distances[i].begin() + pmin.second);
+		}
 
-	cout << "[time find] : " << tfind << " s\n";
-	cout << "[time exec] : " << texec << " s\n";
+		m_distances[pmin.first][pmin.first] = 0;
+	}
 }
 
 template <class C>
