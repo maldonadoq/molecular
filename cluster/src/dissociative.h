@@ -124,23 +124,16 @@ void TDissociative::Run(int _n){
 	typename unordered_map<string,float>::iterator it;
 	float tpr, tnew, tdif, tvalue;
 
-	vector<string> rvector;		// remove vector
+	vector<string> rvector;
 
 	unsigned i;
 	string snew;	
 	float tmin;
-	// int count = 0;
 
 	while((int)m_cluster.size() < (_n-1) and (m_individual_distance.size() > 2)){
-
-		/*for(it=m_individual_distance.begin(); it!=m_individual_distance.end(); it++){
-			cout << it->first << " ";
-		}
-		cout << "\n\n";*/
-
 		tmax = FindMax();
 		m_individual_distance.erase(tmax.first);
-		snew = tmax.first;// +"-";
+		snew = tmax.first;
 
 		rvector.clear();
 		for(it=m_individual_distance.begin(); it!=m_individual_distance.end(); it++){
@@ -148,18 +141,13 @@ void TDissociative::Run(int _n){
 			tnew = m_distances[tmax.first][it->first];
 			tdif = tpr - tnew;
 
-			/* cout << setw(4) << fixed << left << setprecision(2) \
-				<< it->first << "\t" << tpr << "\t" << tnew << "\t" << tdif << "\n"; */
-
 			if(tdif >= 0){				
 				rvector.push_back(it->first);
-				snew += it->first;// +"-";
+				snew += "-"+it->first;
 			}
 		}
 
 		if(rvector.size() > 0){
-			// snew = snew.substr(0,snew.size()-1);
-			// tmp.substr(0, tmp.size()-1
 			for(i=0; i<rvector.size(); i++){
 				m_individual_distance.erase(rvector[i]);
 			}
@@ -190,12 +178,10 @@ void TDissociative::Run(int _n){
 
 	snew = "";
 	for(it=m_individual_distance.begin(); it!=m_individual_distance.end(); it++){
-		snew += it->first;// +"-";
+		snew += "-"+it->first;
 	}
-	// cout << "\n------------\n";
-	// snew = snew.substr(0,snew.size()-1);
 
-	m_cluster.push_back(snew);
+	m_cluster.push_back(snew.substr(1));
 }
 
 vector<string> TDissociative::GetClusters(){
