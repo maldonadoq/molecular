@@ -15,6 +15,16 @@ void print_vector(std::vector<T> _v){
 	std::cout << "\n";
 }
 
+template<class T>
+void print_matrix(std::vector<std::vector<T> > _m){
+	for(unsigned i=0; i<_m.size(); i++){
+		for(unsigned j=0; j<_m[i].size(); j++){
+			std::cout << _m[i][j] << "\t";
+		}
+		std::cout << "\n";
+	}
+}
+
 void pre_processing_file(std::string _filename,
 	std::vector<std::vector<float> > &_vdata, std::vector<std::string> &_vname){
 
