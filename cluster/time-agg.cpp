@@ -2,15 +2,38 @@
 #include <fstream>
 #include <chrono>
 #include <stdio.h>
-#include "src/cmp.h"
 #include "src/utils.h"
-#include "src/tagglomerative.h"
+#include "src/agglomerative.h"
 
 using namespace std::chrono;
 
 using std::cout;
 using std::vector;
 using std::ofstream;
+
+template<class T>
+class TC1{
+public:
+	inline T operator()(T x, T y){
+		return std::min(x,y);
+	}
+};
+
+template<class T>
+class TC2{
+public:
+	inline T operator()(T x, T y){
+		return std::max(x,y);
+	}
+};
+
+template<class T>
+class TC3{
+public:
+	inline T operator()(T x, T y){
+		return (x+y)/2;
+	}
+};
 
 typedef TAgglomerative<TC1<float> > ACS;	// Agglomerative Single Linkage
 typedef TAgglomerative<TC2<float> > ACC;	// Agglomerative Complete Linkage
@@ -41,16 +64,19 @@ int main(int argc, char const *argv[]){
 			case 0:{
 				ACS *as = new ACS();
 				file << "Single Linkage\n";
+				cout << "Single Linkage\n";
 
 				for(unsigned j=0; j<ntest_size; j++){
 					as->Init(distances, headers);
-					file << " N° Cluster: " << ntest_cluster[j] << "\n";
+					file << "N° Cluster: " << ntest_cluster[j] << "\n";
+					cout << "  N° Cluster: " << ntest_cluster[j] << "\n";
 
 					tinit = high_resolution_clock::now();
 						as->Run(ntest_cluster[j]);
 					tend = high_resolution_clock::now();
 					time_span = duration_cast<duration<double>>(tend - tinit);
-					file << " Time: " << time_span.count() << " s\n";
+					file << "Time: " << time_span.count() << " s\n";
+					cout << "   Time: " << time_span.count() << " s\n";
 
 					clusters = as->GetClusters();
 					for(unsigned k=0; k<clusters.size(); k++){
@@ -65,15 +91,18 @@ int main(int argc, char const *argv[]){
 			case 1:{
 				ACC *ac = new ACC();
 				file << "Complete Linkage\n";
+				cout << "Complete Linkage\n";
 				for(unsigned j=0; j<ntest_size; j++){
 					ac->Init(distances, headers);
-					file << " N° Cluster: " << ntest_cluster[j] << "\n";
+					file << "N° Cluster: " << ntest_cluster[j] << "\n";
+					cout << "  N° Cluster: " << ntest_cluster[j] << "\n";
 
 					tinit = high_resolution_clock::now();
 						ac->Run(ntest_cluster[j]);
 					tend = high_resolution_clock::now();
 					time_span = duration_cast<duration<double>>(tend - tinit);
-					file << " Time: " << time_span.count() << " s\n";
+					file << "Time: " << time_span.count() << " s\n";
+					cout << "   Time: " << time_span.count() << " s\n";
 
 					clusters = ac->GetClusters();
 					for(unsigned k=0; k<clusters.size(); k++){
@@ -88,15 +117,18 @@ int main(int argc, char const *argv[]){
 			case 2:{
 				ACA *aa = new ACA();
 				file << "Average Linkage\n";
+				cout << "Average Linkage\n";
 				for(unsigned j=0; j<ntest_size; j++){
 					aa->Init(distances, headers);
-					file << " N° Cluster: " << ntest_cluster[j] << "\n";
+					file << "N° Cluster: " << ntest_cluster[j] << "\n";
+					cout << "  N° Cluster: " << ntest_cluster[j] << "\n";
 
 					tinit = high_resolution_clock::now();
 						aa->Run(ntest_cluster[j]);
 					tend = high_resolution_clock::now();
 					time_span = duration_cast<duration<double>>(tend - tinit);
-					file << " Time: " << time_span.count() << " s\n";
+					file << "Time: " << time_span.count() << " s\n";
+					cout << "   Time: " << time_span.count() << " s\n";
 
 					clusters = aa->GetClusters();
 					for(unsigned k=0; k<clusters.size(); k++){

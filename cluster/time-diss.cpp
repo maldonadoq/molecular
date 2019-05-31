@@ -2,7 +2,6 @@
 #include <fstream>
 #include <chrono>
 #include <stdio.h>
-#include "src/cmp.h"
 #include "src/utils.h"
 #include "src/dissociative.h"
 
@@ -38,17 +37,21 @@ int main(int argc, char const *argv[]){
 
 	for(unsigned i=0; i<ntypes; i++){
 		file << ntypes_name[i];
+		cout << ntypes_name[i];
+
 		DC *diss = new DC();
 		for(unsigned j=0; j<ntest_size; j++){
 			diss->Init(distances, headers);
 			diss->SetType(i);
-			file << " N° Cluster: " << ntest_cluster[j] << "\n";
+			file << "N° Cluster: " << ntest_cluster[j] << "\n";
+			cout << "  N° Cluster: " << ntest_cluster[j] << "\n";
 
 			tinit = high_resolution_clock::now();
 				diss->Run(ntest_cluster[j]);
 			tend = high_resolution_clock::now();
 			time_span = duration_cast<duration<double>>(tend - tinit);
-			file << " Time: " << time_span.count() << " s\n";
+			file << "Time: " << time_span.count() << " s\n";
+			cout << "    Time: " << time_span.count() << " s\n";
 
 
 			clusters = diss->GetClusters();
@@ -59,6 +62,7 @@ int main(int argc, char const *argv[]){
 		}
 		delete diss;
 		file << "\n\n";
+		cout << "\n";
 	}
 
 	file.close();
