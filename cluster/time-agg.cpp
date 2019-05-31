@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]){
 
 	ofstream file("../data/Maldonado-Result-Agg.dat");
 
-	string filename = "../data/Diauxic.txt";
+	string filename = "../data/Cluster.txt";
 	pre_processing_file(filename, distances, headers);
 
 	unsigned ntypes = 3;
