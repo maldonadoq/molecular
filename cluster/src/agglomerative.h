@@ -6,7 +6,10 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <chrono>
 #include <iomanip>
+
+using namespace std::chrono;
 
 using std::unordered_map;
 using std::make_pair;
@@ -84,8 +87,22 @@ void TAgglomerative<C>::Run(unsigned _n){
 	float value;
 
 	float hi, hj;
+
+	high_resolution_clock::time_point tinit;
+	high_resolution_clock::time_point tend;
+	duration<double> time_span;
+
+	float tfind = 0;
+	float texec = 0;
+
 	while(m_headers.size() > _n){
-		pmin = FindMin();
+		tinit = high_resolution_clock::now();
+			pmin = FindMin();
+		tend = high_resolution_clock::now();
+		time_span = duration_cast<duration<double>>(tend - tinit);
+		tfind += time_span.count();
+
+		tinit = high_resolution_clock::now();
 
 		cl1 = m_headers[pmin.first];
 		cl2 = m_headers[pmin.second];
@@ -105,7 +122,14 @@ void TAgglomerative<C>::Run(unsigned _n){
 
 		m_distances.erase(cl1);
 		m_distances.erase(cl2);
+		
+		tend = high_resolution_clock::now();
+		time_span = duration_cast<duration<double>>(tend - tinit);
+		texec += time_span.count();
 	}
+
+	cout << "[time find] : " << tfind << " s\n";
+	cout << "[time exec] : " << texec << " s\n";
 }
 
 template <class C>
