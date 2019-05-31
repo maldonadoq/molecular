@@ -10,7 +10,7 @@ using namespace std::chrono;
 typedef TAgglomerative<TC<float> > Cluster;
 typedef std::vector<float> dvect;
 
-// build: g++ agglomerative.cpp -o agglomerative.out -pthread -O1
+// build: g++ tagglomerative.cpp -o tagglomerative.out -pthread -O1
 int main(int argc, char const *argv[]){
 	std::vector<std::string > headers;
 	std::vector<dvect>        distances;
