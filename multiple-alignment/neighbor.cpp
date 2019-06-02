@@ -1,115 +1,41 @@
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <chrono>
+#include <stdio.h>
+#include "src/neighbor.h"
 
-void PrintV(std::vector<float> & _v){
-	unsigned i;
-	for(i=0; i<_v.size(); i++)
-		printf("%.3lf\t", _v[i]);
-}
+using namespace std::chrono;
 
-void PrintM(std::vector<std::vector<float> > & _v){
-	unsigned i,j;
-	for(i=0; i<_v.size(); i++){
-		for(j=0; j<_v[i].size(); j++){
-			printf("%.3lf\t", _v[i][j]);
-		}
-		std::cout << "\n";
-	}
-}
+int main(int argc, char const *argv[]){
 
-void RemoveItem(std::vector<std::vector<float> > & _mat, int _erase){
-	_mat.erase(_mat.begin() + _erase);
-
-	for(unsigned i=0; i<_mat.size(); i++){
-		_mat[i].erase(_mat[i].begin() + _erase);
-	}
-}
-
-void Neighbor(std::vector<std::vector<float> > _distances){
-
-	std::vector<std::vector<float> > D = _distances, Q, DT;
-
-	std::vector<float> vsum;
-
-	unsigned tsize, i, j;
-	float init, qtmp, dmin = 999999, dtmp;
-
-	int max_id, min_id;
+	std::vector<std::string> dnas;
+	std::vector<std::string> alignment;
 
 	std::pair<int, int> pmin;
 
-	while(D.size() > 2){
-		DT = D;
-		std::cout << "\nD:\n";
-		PrintM(D);
+	dnas.push_back("ATTGCCATT");
+	dnas.push_back("ATGGCCATT");
+	dnas.push_back("ATCCAATTTT");
+	dnas.push_back("ATCTTCTT");
+	dnas.push_back("ACTGACC");
 
-		tsize = D.size();
-		vsum.resize(tsize);
+	int match    = 1;
+	int mismatch = 1;
+	int gap      = 2;
 
-		for(i=0; i<tsize; i++){
-			init = 0;
-			for(j=0; j<D[i].size(); j++){
-				init += D[i][j];
-			}
-			vsum[i] = init;
-		}
-		
-		Q = std::vector<std::vector<float> >(tsize,std::vector<float>(tsize));
+	TNeighbor *p = new TNeighbor(match, mismatch, gap);
 
-		for(i=0; i<Q.size(); i++){
-			for(j=i+1; j<Q[i].size(); j++){
-				qtmp = vsum[i] + vsum[j];
-				Q[i][j] = D[i][j]-(qtmp/((float)tsize-2));
-				Q[j][i] = D[i][j]-(qtmp/((float)tsize-2));
+	p->FSetDna(dnas);
+	p->FAligments();
+	p->FDistances();	
+	pmin = p->FQ();
 
-				if(Q[i][j] < dmin){
-					dmin = Q[i][j];
-					pmin.first  = i;
-					pmin.second = j;
-				}			
-			}
-		}
-		
-		max_id = std::max(pmin.first, pmin.second);
-		min_id = std::min(pmin.first, pmin.second);
+	p->FPrintDistances();
+	std::cout << "\n";
+	p->FPrintQ();
 
-		std::cout << "\nQ:\n";
-		PrintM(Q);
-		std::cout << "\nQ Minimun: [" << pmin.first << "," << pmin.second << "]\n\n";
+	std::cout << "\nMinimun: [" << pmin.first << "," << pmin.second << "]\n";
 
-		RemoveItem(D, max_id);
-		
-		// incomplete
-		j = min_id;
-		for(i=0; i<DT.size(); i++){
-			if(((int)i != min_id) and ((int)i != max_id)){
-				dtmp = (DT[min_id][i] + DT[max_id][i] - DT[min_id][max_id])/2;
-				D[min_id][j] = dtmp;
-				D[j][min_id] = dtmp;
-				j++;
-				std::cout << dtmp << " ";
-			}
-		}
-		std::cout << "\n";
-		D[min_id][min_id] = 0;
-
-	}	
-}
-
-int main(int argc, char const *argv[]){
-	unsigned n = 6;
-
-	std::vector<std::vector<float> > distances;
-	distances = std::vector<std::vector<float> >(n);
-
-	distances[0] = {0,5,4,7,6,8};
-	distances[1] = {5,0,7,10,9,11};
-	distances[2] = {4,7,0,7,6,8};
-	distances[3] = {7,10,7,0,5,9};
-	distances[4] = {6,9,6,5,0,8};
-	distances[5] = {8,11,8,9,8,0};
-
-	Neighbor(distances);
+	delete p;
 	return 0;
 }
