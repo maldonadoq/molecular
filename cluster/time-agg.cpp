@@ -53,7 +53,11 @@ int main(int argc, char const *argv[]){
 
 	unsigned ntypes = 3;
 	unsigned ntest_size = 4;	
-	int ntest_cluster[ntest_size] = {50, 100, 150, 200};
+	int ntest_cluster[ntest_size];
+	ntest_cluster[0] = 50;
+	ntest_cluster[1] = 100;
+	ntest_cluster[2] = 150;
+	ntest_cluster[3] = 200;
 
 	high_resolution_clock::time_point tinit;
 	high_resolution_clock::time_point tend;
