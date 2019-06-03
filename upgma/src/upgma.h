@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <chrono>
 #include <string>
 #include <iomanip>
 #include "utils.h"
@@ -14,10 +15,12 @@ using std::vector;
 using std::cout;
 using std::pair;
 
+using namespace std::chrono;
+
 class TUpgma{
 private:
 	vector<vector<float> > m_distances;
-	vector<string> m_headers;
+	vector<TItem> m_headers;
 
 public:
 	TUpgma();
@@ -26,7 +29,7 @@ public:
 	void Init(vector<vector<float > >, vector<string>);
 	void Run(unsigned);
 	pair<int, int> FindMin();
-	vector<string> GetClusters();
+	vector<TItem> GetClusters();
 };
 
 TUpgma::TUpgma(){
@@ -38,12 +41,16 @@ void TUpgma::Init(vector<vector<float > > _distances, vector<string> _headers){
 		cout << "Error: matrix should be [" << _headers.size() << "x" << _headers.size() << "]\n";
 		return;
 	}
-	m_headers = _headers;
 
 	m_distances.clear();
-	m_distances = std::vector<vector<float> >(_headers.size(), vector<float>(_headers.size()));
+	m_headers.clear();
 
 	unsigned i,j;
+	for(i=0; i<_headers.size(); i++){
+		m_headers.push_back({_headers[i], 1, i, {0,0}, 0});
+	}
+
+	m_distances = std::vector<vector<float> >(_headers.size(), vector<float>(_headers.size()));	
 	for(i=0; i<_distances.size(); i++){
 		for(j=0; j<_distances[i].size(); j++){
 			m_distances[i][j] = _distances[i][j];
@@ -72,14 +79,27 @@ pair<int, int> TUpgma::FindMin(){
 
 void TUpgma::Run(unsigned _n){
 	pair<int, int> pmin;
-	string cl, cl1, cl2;
+	TItem cl, cl1, cl2;
 	float value;
 
 	float hi, hj, ha;
 	int tmp;
 
+	unsigned tidx = m_headers.size();
+	string _body = "upgma_labels = [";
+	for(unsigned i=0; i<tidx-1; i++){
+		_body += "\"" + m_headers[i].m_value + "\",";
+	}
+
+	_body += "\"" + m_headers[tidx-1].m_value + "\"]\n";
+	_body += "upgma_values = [\n";
+
+	high_resolution_clock::time_point tinit;
+	high_resolution_clock::time_point tend;
+	duration<double> time_span;
+
+	tinit = high_resolution_clock::now();
 	while(m_headers.size() > _n){
-		// print_vector(m_headers);
 		pmin = FindMin();
 
 		if(pmin.first > pmin.second){
@@ -88,11 +108,15 @@ void TUpgma::Run(unsigned _n){
 			pmin.second = tmp;
 		}
 
+		// print_matrix(m_distances);
+		// cout << "\n";
+
 		cl1 = m_headers[pmin.first];
 		cl2 = m_headers[pmin.second];
-		cl = cl1 + "-" + cl2;
-		
-		// cout << m_distances[pmin.first][pmin.second] << "\n";
+
+		cl = {cl1.m_value+"-"+cl2.m_value, cl1.m_number+cl2.m_number, tidx, {cl1.m_idx, cl2.m_idx}, (float)m_distances[pmin.first][pmin.second]/2};
+		_body += "\t\t" + item_to_str(cl) + ",\n";
+		// cout << item_to_str(cl) << "\n";
 
 		m_headers[pmin.first] = cl;
 		m_headers.erase(m_headers.begin() + pmin.second);
@@ -100,7 +124,7 @@ void TUpgma::Run(unsigned _n){
 		for(unsigned i=0; i<m_distances.size(); i++){
 			hi = m_distances[i][pmin.first];
 			hj = m_distances[i][pmin.second];
-			ha = (hi+hj)/2;
+			ha = (float)(hi+hj)/2;
 
 			m_distances[i][pmin.first] = ha;
 			m_distances[pmin.first][i] = ha;
@@ -112,11 +136,20 @@ void TUpgma::Run(unsigned _n){
 		}
 
 		m_distances[pmin.first][pmin.first] = 0;
+
+		tidx++;
 	}
-	print_vector(m_headers);
+
+	tend = high_resolution_clock::now();
+	time_span = duration_cast<duration<double>>(tend - tinit);
+	std::cout << "[cluster time] : " << time_span.count() << " s\n";
+
+	_body += "\t]\n";
+	Create_Python(_body);
+	system("python upgma.py");
 }
 
-vector<string> TUpgma::GetClusters(){
+vector<TItem> TUpgma::GetClusters(){
 	return m_headers;
 }
 
