@@ -1,7 +1,9 @@
 #include <iostream>
 #include <chrono>
 #include <stdio.h>
-#include "src/utils.h"
+#include "../utils/print.h"
+#include "../utils/read.h"
+
 #include "src/dissociative.h"
 
 using namespace std::chrono;
@@ -17,7 +19,7 @@ typedef vector<float> dvect;
 int main(int argc, char const *argv[]){
 	int nc = 7;
 	vector<string > headers   = {"A","B","C","D","E","F","G"};
-	vector<dvect>        distances = vector<dvect>(nc, dvect(nc));
+	vector<dvect>	distances = vector<dvect>(nc, dvect(nc));
 	vector<string > clusters;
 
 	distances[0] = {0.00};

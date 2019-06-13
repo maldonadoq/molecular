@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include <iomanip>
-#include "utils.h"
 
 using namespace std::chrono;
 

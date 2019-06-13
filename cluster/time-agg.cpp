@@ -2,7 +2,7 @@
 #include <fstream>
 #include <chrono>
 #include <stdio.h>
-#include "src/utils.h"
+#include "../utils/read.h"
 #include "src/agglomerative.h"
 
 using namespace std::chrono;

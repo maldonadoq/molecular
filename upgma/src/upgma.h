@@ -4,7 +4,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <chrono>
 #include <string>
 #include <iomanip>
 #include "utils.h"
@@ -14,8 +13,6 @@ using std::string;
 using std::vector;
 using std::cout;
 using std::pair;
-
-using namespace std::chrono;
 
 class TUpgma{
 private:
@@ -94,11 +91,6 @@ void TUpgma::Run(unsigned _n){
 	_body += "\"" + m_headers[tidx-1].m_value + "\"]\n";
 	_body += "upgma_values = [\n";
 
-	high_resolution_clock::time_point tinit;
-	high_resolution_clock::time_point tend;
-	duration<double> time_span;
-
-	tinit = high_resolution_clock::now();
 	while(m_headers.size() > _n){
 		pmin = FindMin();
 
@@ -140,13 +132,8 @@ void TUpgma::Run(unsigned _n){
 		tidx++;
 	}
 
-	tend = high_resolution_clock::now();
-	time_span = duration_cast<duration<double>>(tend - tinit);
-	std::cout << "[cluster time] : " << time_span.count() << " s\n";
-
 	_body += "\t]\n";
 	Create_Python(_body);
-	system("python upgma.py");
 }
 
 vector<TItem> TUpgma::GetClusters(){
