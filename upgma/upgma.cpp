@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]){
 	vector<string> headers;
 	vector<dvect>  distances;
 
-	string filename = "../data/Upgma-Small.txt";
+	string filename = "../data/Upgma.txt";
 	pre_processing_file(filename, distances, headers);
 
 	high_resolution_clock::time_point tinit;
