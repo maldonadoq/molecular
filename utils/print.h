@@ -4,6 +4,9 @@
 #include <utility>
 #include <vector>
 
+using std::vector;
+using std::cout;
+
 template<class T>
 void print_matrix(T **matrix, unsigned _n, unsigned _m){
 	for(unsigned i=0; i<_n; i++){		
@@ -26,6 +29,22 @@ void print_matrix(T ***matrix, unsigned _n, unsigned _m, unsigned _l){
 		}
 		std::cout << "\n";
 	}
+}
+
+template<class T>
+void print_matrix(vector<vector<T> > _matrix){
+	unsigned i,j;
+	for(i=0; i<_matrix.size(); i++){
+		for(j=0; j<_matrix[i].size(); j++){
+			cout << _matrix[i][j] << "\t";
+		}
+		cout << "\n";
+	}
+}
+
+template <class T>
+void print_pair(std::pair<T, T> _pair){
+	std::cout << "A1: [" << _pair.first << "]\nA2: [" << _pair.second << "]\n";
 }
 
 template <class T>
