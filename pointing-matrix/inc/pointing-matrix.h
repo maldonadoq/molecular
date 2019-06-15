@@ -4,26 +4,22 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <utility>
+
+#include "../../utils/print.h"
 
 using std::vector;
 using std::string;
 using std::cout;
+
+using std::make_pair;
+using std::pair;
 
 enum{
 	horizontal	= 3,
 	vertical	= 1,
 	diagonal	= 2
 };
-
-void print_matrix(vector<vector<float> > _matrix){
-	unsigned i,j;
-	for(i=0; i<_matrix.size(); i++){
-		for(j=0; j<_matrix[i].size(); j++){
-			cout << _matrix[i][j] << "\t";
-		}
-		cout << "\n";
-	}
-}
 
 class PMatrixAlignment{
 private:
@@ -42,10 +38,11 @@ public:
 
 	int  similarity(char, char);
 	void formation();
-	void alignment();
+	void alignment(string &, string &);
 	void print();
 	void init();
-	void run();
+
+	pair<string, string> run();
 };
 
 PMatrixAlignment::PMatrixAlignment(){
@@ -124,51 +121,53 @@ void PMatrixAlignment::formation(){
 	}
 }
 
-void PMatrixAlignment::alignment(){
-	string al1 = "";
-	string al2 = "";
+void PMatrixAlignment::alignment(string &al1, string &al2){
+	al1 = "";
+	al2 = "";
 
-	float score = 0.0;
+	int score = 0.0;
 	int row = m_dna[1].size();
 	int col = m_dna[0].size();
 
 	while(m_pmatrix[row][col] != 0){
-		if(m_pmatrix[row][col] == 3){
-			al1 += m_dna[1][row-1];
-			al2 += "-";
-			row--;
-			score = score - 1;
-		}
-		else if(m_pmatrix[row][col] == 1){
-			al1 += "-";
-			al2 += m_dna[0][col-1];
-			col--;
-			score = score - 1;
-		}
-		else if(m_pmatrix[row][col] == 2){
-			al1 += m_dna[1][row-1];
-			al2 += m_dna[0][col-1];
 
-			if(m_dna[0][col-1] == m_dna[1][row-1]){
-				score = score + 1;
-			}
-			else{
-				score = score - 1;
-			}
+		if(m_pmatrix[row][col] == horizontal){
+			al1 = m_dna[0][col-1] + al1;
+			al2 = "-" + al2;
+
+			col--;
+			score--;
+		}
+		else if(m_pmatrix[row][col] == vertical){
+			al1 = "-" + al1;
+			al2 = m_dna[1][row-1] + al2;
+
+			row--;
+			score--;
+		}
+		else if(m_pmatrix[row][col] == diagonal){
+			al1 = m_dna[0][col-1] + al1;
+			al2 = m_dna[1][row-1] + al2;
+
+			if(m_dna[0][col-1] == m_dna[1][row-1])
+				score++;
+			else
+				score--;
 
 			row--;
 			col--;
 		}
 	}
 
-	cout << "al1: " << al1 << "\n";
-	cout << "al2: " << al2 << "\n";
+	cout << "Score: " << score << "\n";
 }
 
-void PMatrixAlignment::run(){
+pair<string, string> PMatrixAlignment::run(){
 	formation();
-	// print();
-	// alignment();
+	string al1, al2;
+	alignment(al1, al2);
+
+	return make_pair(al1, al2);
 }
 
 void PMatrixAlignment::print(){
