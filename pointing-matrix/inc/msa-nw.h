@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "../../utils/score.h"
-#include "../../utils/print.h"
 
 using std::vector;
 using std::string;
@@ -18,14 +17,14 @@ using std::pair;
 
 class TNeedlemanWunsch{
 private:
-	string m_dna[2];		// dna string
-	unsigned n, m;				// matrix
+	vector<vector<int> > m_smatrix;	// score matrix
+	string m_dna[2];			// dna string
+
 	int match_score;			// match score
 	int mismatch_score;			// mismatch score
 	int gap_score;				// gap score
 	int score;
 public:	
-	int **m_smatrix;			// score matrix
 
 	TNeedlemanWunsch();
  	TNeedlemanWunsch(int, int, int);
@@ -52,13 +51,15 @@ void TNeedlemanWunsch::init(string _dnaa, string _dnab){
 	this->m_dna[0] = _dnaa;
 	this->m_dna[1] = _dnab;
 
- 	this->n = this->m_dna[1].size()+1;
-	this->m = this->m_dna[0].size()+1;
+ 	this->m_smatrix = vector<vector<int> >(m_dna[1].size()+1, vector<int>(m_dna[0].size()+1));
 
-	this->m_smatrix = new int*[n];
-	for(unsigned i=0; i<n; i++){
-		this->m_smatrix[i] = new int[m];
-	}
+ 	// Init Matrix
+	unsigned i, j;
+	for(i=0; i<m_smatrix.size(); i++)
+		this->m_smatrix[i][0] = i*this->gap_score;
+
+	for(j=0; j<m_smatrix[0].size(); j++)
+		this->m_smatrix[0][j] = j*this->gap_score;
 }
 
 int TNeedlemanWunsch::similarity(char _a, char _b){
@@ -66,18 +67,11 @@ int TNeedlemanWunsch::similarity(char _a, char _b){
 }
 
 void TNeedlemanWunsch::formation(){
-	// Init Matrix
-	unsigned i, j;
-	for(i=0; i<n; i++)
-		this->m_smatrix[i][0] = i*this->gap_score;
-	for(j=0; j<m; j++)
-		this->m_smatrix[0][j] = j*this->gap_score;
+	unsigned i,j;
+ 	int tmp, mtmp;
 
- 	int tmp;
-	int mtmp;
-
- 	for(i=1; i<n; i++){
-		for(j=1; j<m; j++){
+ 	for(i=1; i<m_smatrix.size(); i++){
+		for(j=1; j<m_smatrix[i].size(); j++){
 			tmp = (m_dna[0][j-1] == m_dna[1][i-1])
 				? match_score: mismatch_score;
 
@@ -86,7 +80,7 @@ void TNeedlemanWunsch::formation(){
 		}
 	}
 
- 	score = m_smatrix[n-1][m-1];
+ 	score = m_smatrix[m_smatrix.size()-1][m_smatrix[0].size()-1];
 }
 
 void TNeedlemanWunsch::alignment(string &al1, string &al2){
@@ -143,7 +137,7 @@ TItem TNeedlemanWunsch::run(string _dnaa, string _dnab){
 }
 
 TNeedlemanWunsch::~TNeedlemanWunsch(){
-	this->m_smatrix = NULL;
+	this->m_smatrix.clear();
 }
 
  #endif 

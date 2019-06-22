@@ -1,11 +1,9 @@
 
 #include <iostream>
 #include <utility>
-#include "inc/needleman-wunsch.h"
+#include "inc/msa-nw.h"
 
-using std::cout;
-using std::string;
-
+// build: g++ msa-nw.cpp -o msa-nw.out
 int main(int argc, char const *argv[]){
 
 	string dnaa = "TACACGCCTCTTCGCC";

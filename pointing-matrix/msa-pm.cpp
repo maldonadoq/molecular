@@ -1,7 +1,7 @@
 #include <iostream>
-#include "inc/pointing-matrix.h"
+#include "inc/msa-pm.h"
 
-// build: g++ pointing-matrix.cpp -o pointing-matrix.out
+// build: g++ msa-pm.cpp -o msa-pm.out
 int main(int argc, char const *argv[]){
     string dnaa = "TACACGCCTCTTCGCC";
 	string dnab = "CTGTGAGG";
@@ -14,9 +14,9 @@ int main(int argc, char const *argv[]){
 
     TItem res = pma->run(dnaa, dnab);
 
-    /*cout << "score : " << res.score << "\n";
+    cout << "score : " << res.score << "\n";
     cout << "align1: " << res.first << "\n";
-    cout << "align2: " << res.second << "\n";*/
+    cout << "align2: " << res.second << "\n";
     
     delete pma;
     return 0;
