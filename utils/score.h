@@ -2,6 +2,9 @@
 #define _SCORE_H_
 
 #include <utility>
+#include <string>
+
+using std::string;
 
 class TPairwiseAlignment{
 public:
@@ -31,5 +34,11 @@ std::string str_complete(std::string _dna, char _c, unsigned _size){
 	}
 	return dna;
 }
+
+struct TItem{
+	string first;
+	string second;
+	int score;
+};
 
 #endif

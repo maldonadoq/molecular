@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "../../utils/score.h"
 #include "../../utils/print.h"
 
 using std::vector;
@@ -16,55 +17,54 @@ using std::make_pair;
 using std::pair;
 
 enum{
-	horizontal	= 3,
-	vertical	= 1,
-	diagonal	= 2
+	horizontal	= '3',
+	vertical	= '1',
+	diagonal	= '2',
+	zero 		= '0'
 };
 
 class PMatrixAlignment{
 private:
 	string m_dna[2];					// dna string
-
+	unsigned n, m;						// matrix
 	int match_score;					// match score
 	int mismatch_score;					// mismatch score
 	int gap_score;						// gap score
-
-	vector<vector<float> > m_pmatrix;	// pointing matrix
-	vector<vector<float> > m_smatrix;	// score matrix
+	int score;							// final score
 public:
-	PMatrixAlignment(std::string, std::string, int, int, int);
+	vector<vector<char> > m_pmatrix;
+	int  ** m_smatrix;	// score matrix
+
+	PMatrixAlignment(int, int, int);
 	PMatrixAlignment();
 	~PMatrixAlignment();
 
 	int  similarity(char, char);
 	void formation();
 	void alignment(string &, string &);
-	void print();
-	void init();
-
-	pair<string, string> run();
+	void init(string, string);
+	TItem run(string, string);
 };
 
 PMatrixAlignment::PMatrixAlignment(){
 
 }
 
-PMatrixAlignment::PMatrixAlignment(std::string _dnaa, std::string _dnab,
-	int _match, int _mismatch, int _gap){	
-	
+PMatrixAlignment::PMatrixAlignment(int _match, int _mismatch, int _gap){
 	this->match_score    = _match;
 	this->mismatch_score = _mismatch;
 	this->gap_score      = _gap;
+}
 
+void PMatrixAlignment::init(string _dnaa, string _dnab){
 	this->m_dna[0] = _dnaa;
 	this->m_dna[1] = _dnab;
 
-	init();
-}
+	this->m_pmatrix = vector<vector<char> >(n, vector<char>(m));
 
-void PMatrixAlignment::init(){
-	this->m_pmatrix = vector<vector<float> >(m_dna[1].size()+1, vector<float>(m_dna[0].size()+1));
-	this->m_smatrix = vector<vector<float> >(2, vector<float>(m_dna[0].size()+1));
+	this->m_smatrix = new int*[2];			// score [int 4byte]
+	this->m_smatrix[0] = new int[m];
+	this->m_smatrix[1] = new int[m];
 	
 	unsigned i;
 	for(i=0; i<m_pmatrix.size(); i++){
@@ -76,7 +76,8 @@ void PMatrixAlignment::init(){
 		m_smatrix[0][i] = (int)i*gap_score;
 	}
 
-	m_pmatrix[0][0] = 0;
+	m_pmatrix[0][0] = zero;
+	// print_matrix(m_pmatrix, n, m);
 }
 
 int PMatrixAlignment::similarity(char _a, char _b){
@@ -88,14 +89,14 @@ void PMatrixAlignment::formation(){
 
 	unsigned i, j;		// idx
 	float mx;			// max temporal
-	int pointer;		// come from
+	char pointer;		// come from
 	int cs;				// similarity
 
 	tor = 0;
 	tcr = 1;
 	for(i=1; i<m_pmatrix.size(); i++){
-		m_smatrix[tor][0] = int(i-1)*gap_score;
-		m_smatrix[tcr][0] = int(i)*gap_score;
+		m_smatrix[tor][0] = (int)(i-1)*gap_score;
+		m_smatrix[tcr][0] = (int)i*gap_score;
 
 		for(j=1; j<m_pmatrix[i].size(); j++){
 			cs = similarity(m_dna[1][i-1], m_dna[0][j-1]);
@@ -119,68 +120,53 @@ void PMatrixAlignment::formation(){
 		tor = tcr;
 		tcr = tmp;
 	}
+
+	score = mx;
 }
 
 void PMatrixAlignment::alignment(string &al1, string &al2){
 	al1 = "";
 	al2 = "";
 
-	int score = 0.0;
 	int row = m_dna[1].size();
 	int col = m_dna[0].size();
 
-	while(m_pmatrix[row][col] != 0){
+	while(m_pmatrix[row][col] != zero){
 
 		if(m_pmatrix[row][col] == horizontal){
 			al1 = m_dna[0][col-1] + al1;
 			al2 = "-" + al2;
 
 			col--;
-			score--;
 		}
 		else if(m_pmatrix[row][col] == vertical){
 			al1 = "-" + al1;
 			al2 = m_dna[1][row-1] + al2;
 
 			row--;
-			score--;
 		}
 		else if(m_pmatrix[row][col] == diagonal){
 			al1 = m_dna[0][col-1] + al1;
 			al2 = m_dna[1][row-1] + al2;
 
-			if(m_dna[0][col-1] == m_dna[1][row-1])
-				score++;
-			else
-				score--;
-
 			row--;
 			col--;
 		}
 	}
-
-	cout << "Score: " << score << "\n";
 }
 
-pair<string, string> PMatrixAlignment::run(){
+TItem PMatrixAlignment::run(string _dnaa, string _dnab){
+	init(_dnaa, _dnab);
 	formation();
 	string al1, al2;
 	alignment(al1, al2);
 
-	return make_pair(al1, al2);
-}
-
-void PMatrixAlignment::print(){
-	cout << "Pointing Matrix\n";
-	print_matrix(m_pmatrix);
-
-	cout << "\nScore Matrix\n";
-	print_matrix(m_smatrix);
+	return {al1, al2, score};
 }
 
 PMatrixAlignment::~PMatrixAlignment(){
-	m_pmatrix.clear();
-	m_smatrix.clear();
+	this->m_pmatrix.clear();
+	this->m_smatrix = NULL;
 }
 
 #endif
