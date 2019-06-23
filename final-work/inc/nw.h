@@ -1,5 +1,5 @@
-#ifndef _NEEDLEMAN_WUNSCH_H_
-#define _NEEDLEMAN_WUNSCH_H_
+#ifndef _NW_H_
+#define _NW_H_
 
 #include <iostream>
 #include <vector>

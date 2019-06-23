@@ -61,4 +61,22 @@ void pre_processing_file(std::string _filename,
 	}
 }
 
+void load_data(std::string _filename, std::vector<std::string> &_dnas){
+
+	std::ifstream file(_filename);
+
+	if(!file.is_open()){
+		std::cout << "error! cvs wrong!!\n";
+		return;
+	}
+	
+	_dnas.clear();
+	std::string value;
+
+	while(file.good()){		
+		getline(file,value,'\n');
+		_dnas.push_back(value);
+	}
+}
+
 #endif

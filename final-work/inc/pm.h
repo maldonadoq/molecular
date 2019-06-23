@@ -1,5 +1,5 @@
-#ifndef _POINTING_MATRIX_H_
-#define _POINTING_MATRIX_H_
+#ifndef _PM_H_
+#define _PM_H_
 
 #include <iostream>
 #include <vector>
@@ -124,8 +124,14 @@ void PMatrixAlignment::alignment(string &al1, string &al2){
 	int col = m_dna[0].size();
 
 	while(m_pmatrix[row][col] != zero){
+		if(m_pmatrix[row][col] == diagonal){
+			al1 = m_dna[0][col-1] + al1;
+			al2 = m_dna[1][row-1] + al2;
 
-		if(m_pmatrix[row][col] == horizontal){
+			row--;
+			col--;
+		}
+		else if(m_pmatrix[row][col] == horizontal){
 			al1 = m_dna[0][col-1] + al1;
 			al2 = "-" + al2;
 
@@ -136,13 +142,6 @@ void PMatrixAlignment::alignment(string &al1, string &al2){
 			al2 = m_dna[1][row-1] + al2;
 
 			row--;
-		}
-		else if(m_pmatrix[row][col] == diagonal){
-			al1 = m_dna[0][col-1] + al1;
-			al2 = m_dna[1][row-1] + al2;
-
-			row--;
-			col--;
 		}
 	}
 }
