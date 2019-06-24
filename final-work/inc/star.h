@@ -23,23 +23,22 @@ public:
 	TStar(int, int, int);
 	virtual ~TStar();
 
-	unsigned get_maximun();				// +
-	unsigned max_size(unsigned);				// -
-	void	 set_dna(vector<string>);	// +
-	int		 similarity(char, char);	// +
-	void	 alignment();				// +
+	unsigned get_maximun();
+	unsigned max_size(unsigned);
+	void	 set_dna(vector<string>);
+	int		 similarity(char, char);
+	void	 alignment();
 	
-	vector<string> run();				// +
+	vector<string> run();
 
-	static void  thread_alignment(unsigned, unsigned); // +
+	static void  thread_alignment(unsigned, unsigned);
 };
 
-template<class F>	vector<string> TStar<F>::m_dnas;
-template<class F>	vector<vector<TItem> > TStar<F>::m_mpairs;
-template<class F>	int TStar<F>::match_score;
-template<class F>	int TStar<F>::mismatch_score;
-template<class F>	int TStar<F>::gap_score;
-
+template<class F> vector<string> TStar<F>::m_dnas;
+template<class F> vector<vector<TItem> > TStar<F>::m_mpairs;
+template<class F> int TStar<F>::match_score;
+template<class F> int TStar<F>::mismatch_score;
+template<class F> int TStar<F>::gap_score;
 
 template<class F>
 TStar<F>::TStar(int _match, int _mismatch, int _gap){

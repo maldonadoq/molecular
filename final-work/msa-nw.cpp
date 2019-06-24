@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <utility>
 #include "inc/nw.h"
@@ -22,7 +25,8 @@ int main(int argc, char const *argv[]){
  	msa->set_dna(dnas);
  	alignments = msa->run();
 
- 	print_vector_t(alignments);
+ 	string comm = "pmap -x " + std::to_string(getpid()) + " | tail -n 1";
+ 	system(comm.c_str());
 
  	delete msa;
 	return 0;
