@@ -16,9 +16,10 @@ using std::make_pair;
 using std::pair;
 
 enum{
-	horizontal	= 3,
-	vertical	= 1,
-	diagonal	= 2
+	horizontal	= '3',
+	vertical	= '1',
+	diagonal	= '2',
+	zero 		= '0'
 };
 
 class PMatrixAlignment{
@@ -29,8 +30,8 @@ private:
 	int mismatch_score;					// mismatch score
 	int gap_score;						// gap score
 
-	vector<vector<float> > m_pmatrix;	// pointing matrix
-	vector<vector<float> > m_smatrix;	// score matrix
+	vector<vector<char> > m_pmatrix;	// pointing matrix
+	vector<vector<int> >  m_smatrix;	// score matrix
 public:
 	PMatrixAlignment(std::string, std::string, int, int, int);
 	PMatrixAlignment();
@@ -63,8 +64,8 @@ PMatrixAlignment::PMatrixAlignment(std::string _dnaa, std::string _dnab,
 }
 
 void PMatrixAlignment::init(){
-	this->m_pmatrix = vector<vector<float> >(m_dna[1].size()+1, vector<float>(m_dna[0].size()+1));
-	this->m_smatrix = vector<vector<float> >(2, vector<float>(m_dna[0].size()+1));
+	this->m_pmatrix = vector<vector<char> >(m_dna[1].size()+1, vector<char>(m_dna[0].size()+1));
+	this->m_smatrix = vector<vector<int> >(2, vector<int>(m_dna[0].size()+1));
 	
 	unsigned i;
 	for(i=0; i<m_pmatrix.size(); i++){
@@ -76,7 +77,7 @@ void PMatrixAlignment::init(){
 		m_smatrix[0][i] = (int)i*gap_score;
 	}
 
-	m_pmatrix[0][0] = 0;
+	m_pmatrix[0][0] = zero;
 }
 
 int PMatrixAlignment::similarity(char _a, char _b){
@@ -88,7 +89,7 @@ void PMatrixAlignment::formation(){
 
 	unsigned i, j;		// idx
 	float mx;			// max temporal
-	int pointer;		// come from
+	char pointer;		// come from
 	int cs;				// similarity
 
 	tor = 0;
@@ -129,7 +130,7 @@ void PMatrixAlignment::alignment(string &al1, string &al2){
 	int row = m_dna[1].size();
 	int col = m_dna[0].size();
 
-	while(m_pmatrix[row][col] != 0){
+	while(m_pmatrix[row][col] != zero){
 
 		if(m_pmatrix[row][col] == horizontal){
 			al1 = m_dna[0][col-1] + al1;
