@@ -58,6 +58,8 @@ void PMatrixAlignment::init(string _dnaa, string _dnab){
 	this->m_dna[0] = _dnaa;
 	this->m_dna[1] = _dnab;
 
+	this->m_smatrix.clear();
+	this->m_pmatrix.clear();
 	this->m_pmatrix = vector<vector<char> >(m_dna[1].size()+1, vector<char>(m_dna[0].size()+1));
 	this->m_smatrix = vector<vector<int> >(2, vector<int>(m_dna[0].size()+1));
 	

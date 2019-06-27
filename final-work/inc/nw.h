@@ -51,6 +51,7 @@ void TNeedlemanWunsch::init(string _dnaa, string _dnab){
 	this->m_dna[0] = _dnaa;
 	this->m_dna[1] = _dnab;
 
+	this->m_smatrix.clear();
  	this->m_smatrix = vector<vector<int> >(m_dna[1].size()+1, vector<int>(m_dna[0].size()+1));
 
  	// Init Matrix

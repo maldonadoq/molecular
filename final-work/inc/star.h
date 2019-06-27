@@ -28,6 +28,7 @@ public:
 	void	 set_dna(vector<string>);
 	int		 similarity(char, char);
 	void	 alignment();
+	int 	 sum_of_pairs(vector<string >);
 	
 	vector<string> run();
 
@@ -67,6 +68,23 @@ int TStar<F>::similarity(char _a, char _b){
 }
 
 template<class F>
+int TStar<F>::sum_of_pairs(vector<string > _alignments){
+	int score = 0;
+	int tmp;
+
+	for(unsigned j=0; j<_alignments[0].size(); j++){
+		tmp = 0;
+		for(unsigned i=0; i<_alignments.size(); i++){
+			for(unsigned k=i+1; k<_alignments.size(); k++){
+				tmp += similarity(_alignments[i][j], _alignments[k][j]);
+			}
+		}
+		score += tmp;
+	}
+	return score;
+}
+
+template<class F>
 void TStar<F>::thread_alignment(unsigned i, unsigned _j){
 	TItem tmp;
 	F tfunc(match_score, mismatch_score, gap_score);
@@ -79,7 +97,7 @@ void TStar<F>::thread_alignment(unsigned i, unsigned _j){
 }
 
 template<class F>
-void TStar<F>::alignment(){
+void TStar<F>::alignment(){	
 	thread th[m_dnas.size()-1];
 
 	for(unsigned i=0; i<m_dnas.size()-1; i++){
