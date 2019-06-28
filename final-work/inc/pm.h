@@ -84,7 +84,7 @@ void PMatrixAlignment::formation(){
 	int tor, tcr, tmp;	// old row and current row
 
 	unsigned i, j;		// idx
-	float mx;			// max temporal
+	int mx;				// max temporal
 	char pointer;		// come from
 	int cs;				// similarity
 
