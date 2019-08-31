@@ -6,7 +6,7 @@
 #include <vector>
 #include "../../utils/print.h"
 
-#define TMAX 1000
+#define TMAX 10000
 #define PATH 3
 int DIRECTION[3][2] = {{0,-1},{-1,-1},{-1,0}};
 

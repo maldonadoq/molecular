@@ -8,9 +8,6 @@
 #include "alignment.h"
 #include "../../utils/score.h"
 
-#define TMAX 1000
-#define PATH 3
-
 class TNeedlemanWunsch: public TAlignment{
 public:
 	unsigned m_qp;

@@ -8,9 +8,6 @@
 #include <queue>
 #include "alignment.h"
 
-#define TMAX 1000
-#define PATH 3
-
 class TSmithWaterman: public TAlignment{
 public:
 	int m_score;
