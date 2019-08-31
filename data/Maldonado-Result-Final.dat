@@ -1,0 +1,16 @@
+#size	PM	NW
+10	3760	3732
+50	3820	3948
+100	4024	4284
+500	6640	13344
+1000	14176	40820
+2500	61776	226704
+3500	115504	438208
+5000	227944	887116
+7500	505452	1987992
+10000	891408	3527068
+# GnuPlot
+# set title "Pointing Matrix vs Needleman Wunsch"
+# set ylabel "Memory KB"
+# set xlabel "Size of Sequences"
+# plot "Maldonado-Result-Final.dat" using 1:2 w lp lw 1.5 title "Pointing Matrix", "" using 1:3 w lp lw 1.5 title "Needleman Wunsch"
