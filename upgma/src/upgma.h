@@ -77,7 +77,6 @@ pair<int, int> TUpgma::FindMin(){
 void TUpgma::Run(unsigned _n){
 	pair<int, int> pmin;
 	TItem cl, cl1, cl2;
-	float value;
 
 	float hi, hj, ha;
 	int tmp;
